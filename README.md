@@ -1,11 +1,7 @@
-# Guidance Title (required)
+# Guidance for building cross-platform event-driven payment systems on AWS
 
-The Guidance title should be consistent with the title established first in Alchemy.
-
-**Example:** *Guidance for Product Substitutions on AWS*
-
-This title correlates exactly to the Guidance it’s linked to, including its corresponding sample code repository. 
-
+Customers who build payment systems must ensure that customer transactions and activities are persistently stored and idempotently processed to ensure integrity of data in their systems of record.
+In order to solve for these requirements, architects within the financial services industry often leverage relational databases with transactional capabilities for their ACID (atomicity, consistency, isolation, durability) approaches to data persistence. The applications often persist data to these databases systems with synchronous requests, blocking until the transaction has been committed to the database.
 
 ## Table of Content (required)
 
