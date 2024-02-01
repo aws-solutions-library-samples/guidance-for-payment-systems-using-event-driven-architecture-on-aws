@@ -1,0 +1,14 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Installing Terraform"
+      - curl -o terraform_1.7.1_linux_amd64.zip https://releases.hashicorp.com/terraform/1.7.1/terraform_1.7.1_linux_amd64.zip
+      - unzip -o terraform_1.7.1_linux_amd64.zip && mv terraform /usr/bin
+      - terraform --version
+  build:
+    commands:
+      - python --version
+      - terraform init -backend-config="env/krygsman_us-east-2/backend.hcl"
+      - terraform apply -auto-approve -var="region=us-east-2" -var="root_bucket_name=real-time-posting-poc-bk"
