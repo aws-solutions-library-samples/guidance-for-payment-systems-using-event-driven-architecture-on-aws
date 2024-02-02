@@ -10,12 +10,12 @@ In order to solve for these requirements, architects within the financial servic
 
 ### Required
 
-1. [Overview](#overview-required)
+1. [Overview](#overview)
     - [Cost](#cost)
-2. [Prerequisites](#prerequisites-required)
-    - [Operating System](#operating-system-required)
-3. [Deployment Steps](#deployment-steps-required)
-4. [Deployment Validation](#deployment-validation-required)
+2. [Prerequisites](#prerequisites)
+    - [Operating System](#operating-system)
+3. [Deployment Steps](#deployment-steps)
+4. [Deployment Validation](#deployment-validation)
 5. [Running the Guidance](#running-the-guidance-required)
 6. [Next Steps](#next-steps-required)
 7. [Cleanup](#cleanup-required)
@@ -77,9 +77,9 @@ _You are responsible for the cost of the AWS services used while running this Gu
 
 Replace this amount with the approximate cost for running your Guidance in the default Region. This estimate should be per month and for processing/serving resonable number of requests/entities.
 
-## Prerequisites (required)
+## Prerequisites
 
-### Operating System (required)
+### Operating System
 
 These deployment instructions are optimized to work on Amazon Linux 2 or Mac OSX.
 
