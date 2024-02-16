@@ -11,4 +11,4 @@ phases:
     commands:
       - python --version
       - terraform init -backend-config="env/krygsman_us-east-2/backend.hcl"
-      - terraform apply -auto-approve -var="region=us-east-2" -var="root_bucket_name=real-time-posting-poc-bk"
+      - terraform apply -auto-approve -var="region=us-east-2"

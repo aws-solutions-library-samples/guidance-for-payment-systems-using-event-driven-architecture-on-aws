@@ -86,7 +86,6 @@ resource "aws_cloudwatch_event_rule" "posting" {
 resource "aws_cloudwatch_event_target" "posting_queue" {
   rule = aws_cloudwatch_event_rule.posting.name
   event_bus_name = aws_cloudwatch_event_bus.this.name
-  #arn  = "arn:aws:sqs:eu-west-2:926516876030:PostingQueue.fifo"
   arn = var.posting_queue_arn
   sqs_target {
     message_group_id = "posting-queue"
@@ -94,21 +93,6 @@ resource "aws_cloudwatch_event_target" "posting_queue" {
   dead_letter_config {
     arn = aws_sqs_queue.dlq.arn
   }
-}
-
-# resource "aws_cloudwatch_event_target" "posting_archive" {
-#   rule      = aws_cloudwatch_event_rule.posting.id
-#   target_id = "3"
-#   arn       = aws_cloudwatch_event_archive.this["posting"].arn
-#   #role_arn  = aws_iam_role.this.arn
-# }
-
-resource "aws_cloudwatch_event_target" "firehose_posting" {
-  rule      = aws_cloudwatch_event_rule.posting.name
-  event_bus_name = aws_cloudwatch_event_bus.this.name
-  target_id = "2"
-  arn       = aws_kinesis_firehose_delivery_stream.this.arn
-  role_arn  = aws_iam_role.this.arn
 }
 
 resource "aws_cloudwatch_event_rule" "authrule" {
@@ -141,13 +125,6 @@ resource "aws_lambda_permission" "this" {
   source_arn = aws_cloudwatch_event_rule.authrule.arn
 }
 
-# resource "aws_cloudwatch_event_target" "auth_archive" {
-#   rule      = aws_cloudwatch_event_rule.authrule.id
-#   target_id = "3"
-#   arn       = aws_cloudwatch_event_archive.this["auth"].arn
-#   #role_arn  = aws_iam_role.this.arn
-# }
-
 resource "aws_cloudwatch_event_rule" "enriched" {
   name = var.event_rule_name
   event_bus_name = aws_cloudwatch_event_bus.this.name
@@ -167,12 +144,6 @@ resource "aws_cloudwatch_event_target" "sfn" {
   role_arn = aws_iam_role.this.arn
   
 }
-
-# resource "aws_cloudwatch_event_target" "enriched_archive" {
-#   rule      = aws_cloudwatch_event_rule.enriched.id
-#   target_id = "3"
-#   arn       = aws_cloudwatch_event_archive.this["enriched"].arn
-# }
 
 resource "aws_cloudwatch_event_rule" "foreign" {
   name = "foreign-transactions-posted"
@@ -313,93 +284,4 @@ resource "aws_cloudwatch_event_target" "posted_queue" {
   dead_letter_config {
     arn = aws_sqs_queue.dlq.arn
   }
-}
-
-# resource "aws_cloudwatch_event_target" "posted_archive" {
-#   rule      = aws_cloudwatch_event_rule.posted.id
-#   target_id = "8"
-#   arn       = aws_cloudwatch_event_archive.this["posted"].arn
-#   #role_arn  = aws_iam_role.this.arn
-# }
-
-resource "aws_s3_bucket" "this" {
-
-  bucket        = var.bucket_name
-  force_destroy = true
-}
-
-resource "aws_s3_bucket_ownership_controls" "this" {
-
-  bucket = aws_s3_bucket.this.id
-  rule {
-    object_ownership = "ObjectWriter"
-  }
-}
-
-resource "aws_s3_bucket_acl" "this" {
-
-  bucket     = aws_s3_bucket.this.id
-  acl        = "private"
-  depends_on = [aws_s3_bucket_ownership_controls.this]
-}
-
-resource "aws_kinesis_firehose_delivery_stream" "this" {
-  name        = "payments-firehose-delivery-stream"
-  destination = "extended_s3"
-  extended_s3_configuration {
-    role_arn   = aws_iam_role.firehose.arn
-    bucket_arn = aws_s3_bucket.this.arn
-  }
-}
-
-resource "aws_iam_role" "firehose" {
-  name_prefix = "payments"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "firehose.amazonaws.com"
-      },
-      "Effect": "Allow"
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_policy" "firehose_s3" {
-  name_prefix = "payments"
-
-  policy = <<-EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-        "Sid": "",
-        "Effect": "Allow",
-        "Action": [
-            "s3:AbortMultipartUpload",
-            "s3:GetBucketLocation",
-            "s3:GetObject",
-            "s3:ListBucket",
-            "s3:ListBucketMultipartUploads",
-            "s3:PutObject"
-        ],
-        "Resource": [
-            "${aws_s3_bucket.this.arn}",
-            "${aws_s3_bucket.this.arn}/*"
-        ]
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy_attachment" "firehose_s3" {
-  role       = aws_iam_role.firehose.name
-  policy_arn = aws_iam_policy.firehose_s3.arn
 }

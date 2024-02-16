@@ -51,9 +51,3 @@ variable "state_machine_arn" {
   default     = ""
   description = "Pass the State Machine arn"
 }
-
-variable "bucket_name" {
-  type        = string
-  default     = "real-time-posting-poc"
-  description = "The S3 bucket name for Kinesis"
-}

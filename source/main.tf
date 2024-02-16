@@ -233,7 +233,7 @@ module "event_bridge" {
   posted_queue_arn  = module.posted_queue.arn
   enrich_lambda_arn = module.enrich_lambda.arn
   state_machine_arn = module.sfn.state_machine_arn
-  bucket_name       = "${var.root_bucket_name}-${random_string.this.result}"
+  #bucket_name       = "${var.root_bucket_name}-${random_string.this.result}"
 
 }
 

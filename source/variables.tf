@@ -27,9 +27,3 @@ variable "lambda_arn" {
   description = "ARN of the Lambda"
   default     = ""
 }
-
-variable "root_bucket_name" {
-  type        = string
-  description = "Bucket for Kinesis"
-  default     = "real-time-posting-poc"
-}
