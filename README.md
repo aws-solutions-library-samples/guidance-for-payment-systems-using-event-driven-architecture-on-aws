@@ -1,6 +1,5 @@
 # Guidance for building cross-platform event-driven payment systems on AWS
 
-**TODO**
 
 Customers who build payment systems must ensure that customer transactions and activities are persistently stored and idempotently processed to ensure integrity of data in their systems of record.
 
