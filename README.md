@@ -66,15 +66,24 @@ This sample architecture uses event-driven patterns to post transactions in near
 
 ### Cost
 
-**TODO**
+You are responsible for the cost of the AWS services used while running this Guidance. As of April 2024, the cost for running this Guidance with the default settings in the US East (N. Virginia) Region is approximately **\$1 per month**, assuming 3,000 transactions.
 
-This section is for a high-level cost estimate. Think of a likely straightforward scenario with reasonable assumptions based on the problem the Guidance is trying to solve. If applicable, provide an in-depth cost breakdown table in this section.
+This Guidance uses [Serverless services](https://aws.amazon.com/serverless/), which use a pay-for-value billing model. Costs are incurred with usage of the deployed resources. Refer to the [Sample cost table](#sample-cost-table) for a service-by-service cost breakdown.
 
-Start this section with the following boilerplate text:
+We recommend creating a [budget](https://alpha-docs-aws.amazon.com/awsaccountbilling/latest/aboutv2/budgets-create.html){:target="_blank"} through [AWS Cost Explorer](http://aws.amazon.com/aws-cost-management/aws-cost-explorer/){:target="_blank"} to help manage costs. Prices are subject to change. For full details, refer to the pricing webpage for each AWS service used in this Guidance.
 
-_You are responsible for the cost of the AWS services used while running this Guidance. As of <month> <year>, the cost for running this Guidance with the default settings in the <Default AWS Region (Most likely will be US East (N. Virginia)) > is approximately $<n.nn> per month for processing ( <nnnnn> records )._
+#### Sample cost table
 
-Replace this amount with the approximate cost for running your Guidance in the default Region. This estimate should be per month and for processing/serving resonable number of requests/entities.
+The following table provides a sample cost breakdown for deploying this Guidance with the default parameters in the US East (N. Virginia) Region for one month.
+
+| **AWS service**  | Dimensions | Cost \[USD\] |
+|-----------|------------|
+| [Amazon DynamoDB](https://aws.amazon.com/dynamodb/pricing/){:target="_blank"} | 1 GB Data Storage,1 KB avg item size,3000 DynamoDB Streams per month  | \$ 0.25 |
+| [AWS Lambda](https://aws.amazon.com/lambda/pricing/){:target="_blank"} | 3,000 requests per month with 200 ms avg duration, 128 MB memory,512 MB ephemeral storage | \$ 0.00 |
+| [Amazon SQS](https://aws.amazon.com/sqs/pricing/){:target="_blank"} | 0.03 million requests per month | \$ 0.00 |
+| [AWS Step Functions](https://aws.amazon.com/step-functions/pricing/){:target="_blank"} | 3,000 workflow requests per month with 3 state transitions per workflow | \$ 0.13 |
+| [Amazon SNS](https://aws.amazon.com/sns/pricing/){:target="_blank"} | 3,000 requests users nd 3000 Email notifications per month | \$ 0.04 |
+| [Amazon EventBridge](https://aws.amazon.com/eventbridge/pricing/){:target="_blank"} | 3,000 custom events per month with 3000 events replay and 3000 requests in the pipes | \$ 0.00 |
 
 ## Prerequisites
 
