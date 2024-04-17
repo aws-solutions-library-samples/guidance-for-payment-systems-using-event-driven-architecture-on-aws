@@ -77,7 +77,7 @@ We recommend creating a [budget](https://alpha-docs-aws.amazon.com/awsaccountbi
 The following table provides a sample cost breakdown for deploying this Guidance with the default parameters in the US East (N. Virginia) Region for one month.
 
 | **AWS service**  | Dimensions | Cost \[USD\] |
-|-----------|------------|
+|-----------|------------|---------|
 | [Amazon DynamoDB](https://aws.amazon.com/dynamodb/pricing/) | 1 GB Data Storage,1 KB avg item size,3000 DynamoDB Streams per month  | \$ 0.25 |
 | [AWS Lambda](https://aws.amazon.com/lambda/pricing/) | 3,000 requests per month with 200 ms avg duration, 128 MB memory,512 MB ephemeral storage | \$ 0.00 |
 | [Amazon SQS](https://aws.amazon.com/sqs/pricing/) | 0.03 million requests per month | \$ 0.00 |
