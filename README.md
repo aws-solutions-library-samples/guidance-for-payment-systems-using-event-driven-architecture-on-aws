@@ -78,12 +78,12 @@ The following table provides a sample cost breakdown for deploying this Guidance
 
 | **AWS service**  | Dimensions | Cost \[USD\] |
 |-----------|------------|
-| [Amazon DynamoDB](https://aws.amazon.com/dynamodb/pricing/){:target="_blank"} | 1 GB Data Storage,1 KB avg item size,3000 DynamoDB Streams per month  | \$ 0.25 |
-| [AWS Lambda](https://aws.amazon.com/lambda/pricing/){:target="_blank"} | 3,000 requests per month with 200 ms avg duration, 128 MB memory,512 MB ephemeral storage | \$ 0.00 |
-| [Amazon SQS](https://aws.amazon.com/sqs/pricing/){:target="_blank"} | 0.03 million requests per month | \$ 0.00 |
-| [AWS Step Functions](https://aws.amazon.com/step-functions/pricing/){:target="_blank"} | 3,000 workflow requests per month with 3 state transitions per workflow | \$ 0.13 |
-| [Amazon SNS](https://aws.amazon.com/sns/pricing/){:target="_blank"} | 3,000 requests users nd 3000 Email notifications per month | \$ 0.04 |
-| [Amazon EventBridge](https://aws.amazon.com/eventbridge/pricing/){:target="_blank"} | 3,000 custom events per month with 3000 events replay and 3000 requests in the pipes | \$ 0.00 |
+| [Amazon DynamoDB](https://aws.amazon.com/dynamodb/pricing/) | 1 GB Data Storage,1 KB avg item size,3000 DynamoDB Streams per month  | \$ 0.25 |
+| [AWS Lambda](https://aws.amazon.com/lambda/pricing/) | 3,000 requests per month with 200 ms avg duration, 128 MB memory,512 MB ephemeral storage | \$ 0.00 |
+| [Amazon SQS](https://aws.amazon.com/sqs/pricing/) | 0.03 million requests per month | \$ 0.00 |
+| [AWS Step Functions](https://aws.amazon.com/step-functions/pricing/) | 3,000 workflow requests per month with 3 state transitions per workflow | \$ 0.13 |
+| [Amazon SNS](https://aws.amazon.com/sns/pricing/)| 3,000 requests users nd 3000 Email notifications per month | \$ 0.04 |
+| [Amazon EventBridge](https://aws.amazon.com/eventbridge/pricing/) | 3,000 custom events per month with 3000 events replay and 3000 requests in the pipes | \$ 0.00 |
 
 ## Prerequisites
 
@@ -138,11 +138,28 @@ You can find services available by region in the [Global Infrastructure document
 
 ## Deployment Steps (required)
 
-1. Clone the repo using command `git clone https://github.com:aws-solutions-library-samples/guidance-for-building-cross-platform-event-driven-payment-systems-on-aws`
-2. Change directory to the source folder inside the repo `cd guidance-for-building-cross-platform-event-driven-payment-systems-on-aws/source`
-3. Initialize Terraform using command `terraform init`
-4. To see the resources that will be deployed, run `terraform plan`. This will not deploy anything to your environment
-5. To deploy the solution, run `terraform apply -var="region=<your target region>" -var="root_bucket_name=<unique S3 bucket name>"`. Terraform will generate a plan, then prompt you to confirm that you want to deploy the listed resources. Type `yes` if you want to deploy
+1. Clone the code repository using command:
+ ```bash
+ git clone https://github.com/aws-solutions-library-samples/guidance-for-building-cross-platform-event-driven-payment-systems-on-aws
+ ```
+2. Change directory to the source folder inside the repository: 
+```bash
+cd guidance-for-building-cross-platform-event-driven-payment-systems-on-aws/source
+```
+3. Initialize Terraform using the following command
+ ```bash
+ terraform init
+ ```
+4. To see the resources that will be deployed, run command:
+ ```bash
+ terraform plan
+ ```
+ - this will not deploy anything to your environment
+5. To actually deploy the guidance sample code, run the following command:
+ ```bash
+ terraform apply -var="region=<your target region>" -var="root_bucket_name=<unique S3 bucket name>"
+ ```
+ Terraform will generate a plan, then prompt you to confirm that you want to deploy the listed resources. Type `yes` if you want to deploy
 
 ## Deployment Validation  (required)
 
