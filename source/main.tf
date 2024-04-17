@@ -11,7 +11,7 @@ terraform {
 locals {
   definition_template = <<EOF
 {
-  "Comment": "A Hello World example demonstrating various state types of the Amazon States Language",
+  "Comment": "State machine implementing sample business rules for building cross-platform event-driven payment systems on AWS guidance",
   "StartAt": "ValidateTransaction",
   "States": {
     "ValidateTransaction": {
