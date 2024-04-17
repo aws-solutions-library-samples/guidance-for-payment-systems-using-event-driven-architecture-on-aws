@@ -4,10 +4,6 @@ provider "aws" {
 
 provider "random" {}
 
-terraform {
-  backend "s3" {}
-}
-
 locals {
   definition_template = <<EOF
 {
