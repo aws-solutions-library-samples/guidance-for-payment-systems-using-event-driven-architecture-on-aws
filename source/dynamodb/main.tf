@@ -28,6 +28,10 @@ resource "aws_dynamodb_table" "this" {
       type = attribute.value.type
     }
   }
+  
+  server_side_encryption {
+    enabled = true
+  }
 
   tags = merge(
     var.tags,

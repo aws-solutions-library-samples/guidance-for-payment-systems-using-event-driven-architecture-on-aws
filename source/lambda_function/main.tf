@@ -100,16 +100,16 @@ resource "aws_iam_role" "this" {
       Version = "2012-10-17"
       Statement = flatten(
         [
-          {
-            Action = [
-              "ec2:CreateNetworkInterface",
-              "ec2:DeleteNetworkInterface",
-              "ec2:DescribeInstances",
-              "ec2:DescribeNetworkInterfaces"
-            ]
-            Effect   = "Allow"
-            Resource = "*"
-          },
+          # {
+          #   Action = [
+          #     "ec2:CreateNetworkInterface",
+          #     "ec2:DeleteNetworkInterface",
+          #     "ec2:DescribeInstances",
+          #     "ec2:DescribeNetworkInterfaces"
+          #   ]
+          #   Effect   = "Allow"
+          #   Resource = "*"
+          # },
           {
             Action = [
               "logs:CreateLogStream",

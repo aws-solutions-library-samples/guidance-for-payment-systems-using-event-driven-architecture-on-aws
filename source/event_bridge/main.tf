@@ -69,6 +69,7 @@ resource "aws_sqs_queue" "dlq" {
   name                        = "paymentsdlq"
   fifo_queue                  = false
   content_based_deduplication = false
+  sqs_managed_sse_enabled     = true
 }
 
 resource "aws_cloudwatch_event_rule" "posting" {
