@@ -3,7 +3,7 @@
 Kindly clone the code into your favourite IDE. 
 
 ```bash
-giit clone << repo name >>
+git clone << repo name >>
 ```
 
 The solution is deployed as one terraform config. The Root HCL config file (main.tf) dictates the flow and all the submodules are bundled under thiss repo in individual folders (for ex /sqs for the sqs module). The /src folder has all the Lambda code associated with it. 
@@ -45,7 +45,7 @@ Validating Deployment
 
 1. Log in to your AWS Account Console
 2. Sanity check if all resources are created
-3. Under DynamDB, insert a row in table 'visa' with test values
+3. Under DynamoDB, insert a row in table 'visa' with test values
 4. if the transaction is successful you should see a sucesssfull CW log event under log group '/aws/lambda/payments-posting'
 5. if the traansaction is not succeessful, you can follow the architecture guide and track the transaction and see where it has stopped processing.
 6. We have also created a mock lambda whch can insert a mock message into the 'visa' DynamoDB table. You can siimply invoke the 'payments-visa-mock' lambda from the console to achive the same effect.
