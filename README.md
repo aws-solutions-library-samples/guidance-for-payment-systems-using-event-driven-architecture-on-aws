@@ -42,27 +42,43 @@ This sample architecture uses event-driven patterns to post transactions in near
 
 ### Architecture and Message Flow
 
-![Architecture Diagram](./assets/images/architecture-annotated.png)
+<!-- ![Architecture Diagram](./assets/images/architecture-annotated.png) -->
+![Architecture Diagram](./assets/images/event-driven-payment-systems-architecture-new.png)
 
-1. A user initiates a payment which the authorization application approves and persists to an Amazon DynamoDB table.
+1. A user initiates a payment which the authorization application approves and persists to an [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) table.
 
-2. An Amazon EventBridge Pipe reads approved authorization records from the DynamoDB table stream and publishes events to an EventBridge custom bus. 
+2. An [Amazon EventBridge](https://aws.amazon.com/eventbridge/) Pipe reads approved authorization records from the [DynamoDB](https://aws.amazon.com/dynamodb/) table stream and publishes events to an EventBridge custom bus.
 
-3. Duplicate-checking logic can be added to the EventBridge Pipe through a deduplication AWS Lambda function.
+3. Duplicate-checking logic can be added to the [EventBridge](https://aws.amazon.com/eventbridge/) Pipe through a deduplication [AWS Lambda](https://aws.amazon.com/lambda/) function.
 
-4. An EventBridge rule invokes an enrichment Lambda function for events that match to add context like account type and bank details.
+4. An [EventBridge](https://aws.amazon.com/eventbridge/) rule invokes an enrichment [Lambda](https://aws.amazon.com/lambda/) function for events that match to add context like account type and bank details.
 
-5. The Lambda function queries metadata and publishes a new event back to the EventBridge custom bus with extra info.
+5. The [Lambda](https://aws.amazon.com/lambda/) function queries metadata and publishes a new event back to the [EventBridge](https://aws.amazon.com/eventbridge/) custom bus with extra info.
 
-6. An EventBridge rule watching for enriched events invokes an AWS Step Functions workflow to apply business rules to the event as part of a rules engine. In this case the Step Function workflow is representative of any rules engine, such as [Drools](https://www.drools.org/) or similar.
+6. An [EventBridge](https://aws.amazon.com/eventbridge/) rule watching for enriched events invokes an [AWS Step Functions](https://aws.amazon.com/step-functions/) state machine to apply business rules to the event as part of a rules engine. In this case the [Step Function](https://aws.amazon.com/step-functions/) state machine is representative of any rules engine, such as Drools or similar.
 
-7. When an event passes all business rules, the Step Functions workflow publishes a new event back to the EventBridge bus.
+7. When an event passes all business rules, the [Step Functions](https://aws.amazon.com/step-functions/) state machine publishes a new event back to the [EventBridge](https://aws.amazon.com/eventbridge/) bus.
 
-8. An EventBridge rule enqueues a message in an Amazon Simple Queue Service (SQS) queue as a buffer to avoid overrunning the downstream posting subsystem.
+8. An [EventBridge](https://aws.amazon.com/eventbridge/) rule enqueues a message in an [Amazon Simple Queue Service](https://aws.amazon.com/sqs/) (SQS) queue as a buffer to avoid overrunning the downstream posting subsystem.
 
-9. A Lambda function reads from the SQS queue and invokes the downstream posting subsystem to post the transaction.
+9. A [Lambda](https://aws.amazon.com/lambda/) function reads from the [SQS](https://aws.amazon.com/sqs/) queue and invokes the downstream posting subsystem to post the transaction.
 
-10. The Lambda function publishes a final event back to the EventBridge bus.
+10. The [Lambda](https://aws.amazon.com/lambda/) function publishes a final event back to the [EventBridge](https://aws.amazon.com/eventbridge/) bus.
+
+### AWS services in this Guidance
+
+| **AWS service**  | Description |
+|-----------|------------|
+| [Amazon Eventbridge](https://aws.amazon.com/eventbridge/) | Core. An EventBridge custom event bus is is paired with EventBridge rules to route transaction processing events to subscribed components. The emitted events describe the lifecyle of transactions as they move through the system. Additionally, an EventBridge pipe is used to consume the inbound transaction stream and publish events to the event bus. |
+| [AWS Lambda](https://aws.amazon.com/lambda/) | Core. Runs custom code in response to events. This guidance includes a sample duplication detection function, a transaction enrichment function, a sample posting system integration function, and others. |
+| [Amazon Simple Queue Service (SQS)](https://aws.amazon.com/sqs/) | Core. Used as a durable buffer for when we need to capture events from rules, but need to govern scale-out. |
+| [Amazon Simple Storage Service (S3)](https://aws.amazon.com/s3/) | Core. Stores audit and transaction logs captured by EventBridge archives. |
+| [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) | Core. Acts as one possible ingest method for inbound transactions. Transactions are written to a DynamoDB table, which pushes records onto a DynamoDB stream. The stream records are published to the EventBridge event bus to start the processing lifecycle. |
+| [AWS Step Functions](https://aws.amazon.com/step-functions/) | Supporting. Implements a simple business rules system, triggering alternate processing paths for transactions with unique characteristics. This could be implemented by alternate business rules systems like [Drools](https://www.drools.org/). |
+| [Amazon CloudWatch](https://aws.amazon.com/cloudwatch/) | Supporting. Monitors system health via metrics and logs. |
+| [AWS X-Ray](https://aws.amazon.com/xray/) | Supporting. Traces transaction processing across components. |
+| [AWS Identity and Access Management (IAM)](https://aws.amazon.com/iam/) | Supporting. Defines roles and access policies between components in the system. |
+| [AWS Key Management Service (KMS)](https://aws.amazon.com/kms/) | Supporting. Manages encryption of transaction data. |
 
 ### Cost
 
@@ -70,7 +86,7 @@ You are responsible for the cost of the AWS services used while running this Gui
 
 This Guidance uses [Serverless services](https://aws.amazon.com/serverless/), which use a pay-for-value billing model. Costs are incurred with usage of the deployed resources. Refer to the [Sample cost table](#sample-cost-table) for a service-by-service cost breakdown.
 
-We recommend creating a [budget](https://alpha-docs-aws.amazon.com/awsaccountbilling/latest/aboutv2/budgets-create.html){:target="_blank"} through [AWS Cost Explorer](http://aws.amazon.com/aws-cost-management/aws-cost-explorer/){:target="_blank"} to help manage costs. Prices are subject to change. For full details, refer to the pricing webpage for each AWS service used in this Guidance.
+We recommend creating a [budget](https://alpha-docs-aws.amazon.com/awsaccountbilling/latest/aboutv2/budgets-create.html) through [AWS Cost Explorer](http://aws.amazon.com/aws-cost-management/aws-cost-explorer/) to help manage costs. Prices are subject to change. For full details, refer to the pricing webpage for each AWS service used in this Guidance.
 
 #### Sample cost table
 
