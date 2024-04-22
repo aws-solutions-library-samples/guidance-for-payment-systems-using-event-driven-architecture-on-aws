@@ -213,8 +213,8 @@ As transactions move through the system, you will see metrics being published to
 
 Consider subscribing your own business rules engine to the EventBridge event bus and processing inbound transactions using your own logic.
 
-- Visit [ServerlessLand](https://serverlessland.com/){:target="_blank"} for more information on building with AWS Serverless services
-- Visit [What is an Event-Driven Architecture?](https://aws.amazon.com/event-driven-architecture/){:target="_blank"} in the AWS documentation for more information about Event-Driven systems
+- Visit [ServerlessLand](https://serverlessland.com/) for more information on building with AWS Serverless services
+- Visit [What is an Event-Driven Architecture?](https://aws.amazon.com/event-driven-architecture/) in the AWS documentation for more information about Event-Driven systems
 
 ## Cleanup
 
@@ -224,7 +224,7 @@ To manually remove the deployed resources, use the [`terraform show` command](ht
 
 To automatically remove the resources with Terraform, follow these steps:
 
-1. Empty the the Guidance S3 buckets in the AWS Management Console. WS Guidance\'s Implementations do not automatically delete [S3](https://aws.amazon.com/s3/){:target="_blank"} bucket content in case you have stored data to retain.
+1. Empty the the Guidance S3 buckets in the AWS Management Console. WS Guidance\'s Implementations do not automatically delete [S3](https://aws.amazon.com/s3/) bucket content in case you have stored data to retain.
 2. To remove the provisoned resources, run the following command from the root of the `/source` directory in the code repository:
 
 ```bash
