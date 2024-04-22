@@ -8,28 +8,26 @@ Instead, this sample architecture uses event-driven patterns to post transaction
 
 ## Table of Contents
 
-### Required
-
 1. [Overview](#overview)
+    - [Architecture and Message Flow](#architecture-and-message-flow)
+    - [AWS services in this Guidance](#aws-services-in-this-guidance)
     - [Cost](#cost)
 2. [Prerequisites](#prerequisites)
     - [Operating System](#operating-system)
+    - [Third-party tools](#third-party-tools)
+    - [Service quotas](#service-quotas)
 3. [Deployment Steps](#deployment-steps)
 4. [Deployment Validation](#deployment-validation)
-5. [Running the Guidance](#running-the-guidance-required)
-6. [Next Steps](#next-steps-required)
-7. [Cleanup](#cleanup-required)
-
-***Optional***
-
-8. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations-optional)
-9. [Revisions](#revisions-optional)
-10. [Notices](#notices-optional)
-11. [Authors](#authors-optional)
-12. [Requirements](#requirements)
-     - [Functional Requirements](#functional-requirements)
-     - [Non-Functional Requirements](#non-functional-requirements)
-13. [Decision Register](#decision-register)
+5. [Running the Guidance](#running-the-guidance)
+6. [Next Steps](#next-steps)
+7. [Cleanup](#cleanup)
+8. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations)
+    - [Functional Requirements](#what-were-the-functional-requirements-guiding-design-of-the-system)
+    - [Non-Functional Requirements](#what-were-the-non-functional-requirements-guiding-design-of-the-system)
+    - [Architecture Decision Register](#what-were-the-architectural-decisions-made-along-the-way-architecture-decision-register)
+9. [Revisions](#revisions)
+10. [Notices](#notices)
+11. [Authors](#authors)
 
 ## Overview
 
@@ -137,7 +135,7 @@ Services include:
 * AWS Step Function workflows
 * Amazon Simple Notification Service (SNS) topics
 
-### Service limits
+### Service quotas
 
 Experimental workloads should fit within default service quotas for the involved services.
 
@@ -316,11 +314,9 @@ We see financial services customers using mostly Java and Python. For simplicity
 
 ## Notices
 
-Include a legal disclaimer
-
 *Customers are responsible for making their own independent assessment of the information in this Guidance. This Guidance: (a) is for informational purposes only, (b) represents AWS current product offerings and practices, which are subject to change without notice, and (c) does not create any commitments or assurances from AWS and its affiliates, suppliers or licensors. AWS products or services are provided “as is” without warranties, representations, or conditions of any kind, whether express or implied. AWS responsibilities and liabilities to its customers are controlled by AWS agreements, and this Guidance is not part of, nor does it modify, any agreement between AWS and its customers.*
 
-## Authors (optional)
+## Authors
 
 - Ramesh Mathikumar
 - Rajdeep Banerjee
