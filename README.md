@@ -155,7 +155,7 @@ To automatically remove the resources with Terraform, follow these steps:
 2. To remove the provisoned resources, run the following command from the root of the `/source` directory in the code repository:
 
 ```bash
-terraform destroy -var="region=<your target region>"
+terraform destroy
 ```
 
 ## FAQ, known issues, additional considerations, and limitations
