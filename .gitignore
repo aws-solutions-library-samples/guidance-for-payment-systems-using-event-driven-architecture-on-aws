@@ -34,4 +34,4 @@ terraform.rc
 .venv
 
 # Build output for lambda functions
-build/**/*
+**/build/**/*
