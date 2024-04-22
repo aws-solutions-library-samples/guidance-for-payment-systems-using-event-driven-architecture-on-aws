@@ -1,9 +1,10 @@
 # Guidance for building cross-platform event-driven payment systems on AWS
 
+This guidance focuses on payment processing subsystems responsible for posting payments to recieving accounts. In this phase of payment processing, inbound transactions are evaluated, have accounting rules applied to them, then are posted into receiving accounts. The accounting rules dictate the work that needs to happen to successfully process the transaction. Inbound transactions are assumed to have been authorized by an upstream process.
 
-Customers who build payment systems must ensure that customer transactions and activities are persistently stored and idempotently processed to ensure integrity of data in their systems of record.
+In traditional architectures, the upstream system writes transactions to a log. The log is periodically picked up by a batch-based processing system system, processed in bulk, then eventually posted to customer accounts. Transactions (and customers!) must wait for the next batch iteration before being processed, which can take multiple days.
 
-In order to solve for these requirements, architects within the financial services industry often leverage relational databases with transactional capabilities for their ACID (atomicity, consistency, isolation, durability) approaches to data persistence. The applications often persist data to these databases systems with synchronous requests, blocking until the transaction has been committed to the database.
+Instead, this sample architecture uses event-driven patterns to post transactions in near real-time rather than in batches. Transaction lifecycle events are published to an [Amazon EventBridge](https://aws.amazon.com/eventbridge/) event bus. Rules forward the events to processors, which act on the events, then emit their own events, moving the transaction through its lifecycle. Processors can be easily added or removed as organization needs change. Customers get a more fine-grained account balance and can dispute transactions much sooner. Processing load is offloaded from batch systems during critical hours.
 
 ## Table of Contents
 
@@ -94,12 +95,13 @@ The following table provides a sample cost breakdown for deploying this Guidance
 
 | **AWS service**  | Dimensions | Cost \[USD\] |
 |-----------|------------|---------|
-| [Amazon DynamoDB](https://aws.amazon.com/dynamodb/pricing/) | 1 GB Data Storage,1 KB avg item size,3000 DynamoDB Streams per month  | \$ 0.25 |
-| [AWS Lambda](https://aws.amazon.com/lambda/pricing/) | 3,000 requests per month with 200 ms avg duration, 128 MB memory,512 MB ephemeral storage | \$ 0.00 |
+| [Amazon DynamoDB](https://aws.amazon.com/dynamodb/pricing/) | 1 GB Data Storage, 1 KB avg item size, 3000 DynamoDB Streams per month  | \$ 0.25 |
+| [AWS Lambda](https://aws.amazon.com/lambda/pricing/) | 3,000 requests per month with 200 ms avg duration, 128 MB memory, 512 MB ephemeral storage | \$ 0.00 |
 | [Amazon SQS](https://aws.amazon.com/sqs/pricing/) | 0.03 million requests per month | \$ 0.00 |
 | [AWS Step Functions](https://aws.amazon.com/step-functions/pricing/) | 3,000 workflow requests per month with 3 state transitions per workflow | \$ 0.13 |
 | [Amazon SNS](https://aws.amazon.com/sns/pricing/)| 3,000 requests users nd 3000 Email notifications per month | \$ 0.04 |
 | [Amazon EventBridge](https://aws.amazon.com/eventbridge/pricing/) | 3,000 custom events per month with 3000 events replay and 3000 requests in the pipes | \$ 0.00 |
+|**Total estimated cost per month:**| | **\$1** |
 
 ## Prerequisites
 
@@ -139,20 +141,11 @@ Services include:
 
 Experimental workloads should fit within default service quotas for the involved services.
 
-### Supported Regions
+## Deployment Steps
 
-This Guidance is best suited for regions that support these services:
+Before you launch the Guidance, review the cost, architecture, security, and other considerations discussed in this guide. Follow the step-by-step instructions in this section to configure and deploy the Guidance into your account.
 
-* Amazon EventBridge Custom Event Bus, Pipes, Rules
-* AWS Lambda functions
-* Amazon Simple Queue Services (SQS) queues
-* Amazon DynamoDB tables and streams
-* AWS Step Function workflows
-* Amazon Simple Notification Service (SNS) topics
-
-You can find services available by region in the [Global Infrastructure documentation](https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/).
-
-## Deployment Steps (required)
+**Time to deploy:** Approximately 30 minutes
 
 1. Clone the code repository using command:
  ```bash
@@ -168,16 +161,16 @@ cd guidance-for-building-cross-platform-event-driven-payment-systems-on-aws/sour
  ```
 4. To see the resources that will be deployed, run command:
  ```bash
- terraform plan
+ terraform plan -var="region=<your target region>"
  ```
  - this will not deploy anything to your environment
 5. To actually deploy the guidance sample code, run the following command:
  ```bash
- terraform apply -var="region=<your target region>" -var="root_bucket_name=<unique S3 bucket name>"
+ terraform apply -var="region=<your target region>"
  ```
- Terraform will generate a plan, then prompt you to confirm that you want to deploy the listed resources. Type `yes` if you want to deploy
+ Terraform will generate a plan, then prompt you to confirm that you want to deploy the listed resources. Type `yes` if you want to deploy.
 
-## Deployment Validation  (required)
+## Deployment Validation
 
 When successful, Terraform Outputs the ARN for the DynamoDB input table's stream. It should look something like this: 
 
@@ -192,90 +185,68 @@ stream_arn = "arn:aws:dynamodb:us-east-2:111111111111:table/visa/stream/2024-01-
 Confirm your resources were created by logging into the AWS Management console. Make sure you are in the region you specified in the `terraform apply` command. Check for your resources.
 
 * Open the EventBridge console and verify a `payments` Custom Event Bus exists
+
+![Custom EventBridge bus in the AWS Management Console](/assets/images/confirm-eventbridge-bus.png)
+
 * Open the DynamoDB console and verify a `visa` table exists
-* **TODO** WHAT ELSE NEEDS TO BE CHECKED?
 
-**Examples:**
+![DynamoDB table in the AWS Management Console](/assets/images/confirm-dynamodb-table.png)
 
-* Open CloudFormation console and verify the status of the template with the name starting with xxxxxx.
-* If deployment is successful, you should see an active database instance with the name starting with <xxxxx> in        the RDS console.
-*  Run the following CLI command to validate the deployment: ```aws cloudformation describe xxxxxxxxxxxxx```
+## Running the Guidance
 
-## Running the Guidance (required)
+You can kick off transaction processing by writing a properly-formed record to the `visa` table in [DynamoDB](https://aws.amazon.com/dynamodb/).
 
-**TODO**
+The Guidance includes a [Lambda](https://aws.amazon.com/lambda/) function named `visa-mock`, which you can invoke to write sample records to [DynamoDB](https://aws.amazon.com/dynamodb/). You can invoke the function by following these steps:
 
-<Provide instructions to run the Guidance with the sample data or input provided, and interpret the output received.> 
+1. Navigate to the [Lambda service](https://console.aws.amazon.com/lambda/) for your target region in the AWS Management Console
+2. Click on the `visa-mock` function and open the `Test` tab
+3. Specify a new test event, fill out the Event name field, and change the Event JSON to be an empty set of braces: `{}`
+    1. Note: the Event JSON content does not matter, as long at it is valid JSON
+4. Click the `Test` button
+5. You should see an `Executing function: succeeded` message, and no errors in the Log output
 
-This section should include:
+![Lambda invoke succeeded](/assets/images/visa-mock-invoke-succeeded.png)
 
-* Guidance inputs
-* Commands to run
-* Expected output (provide screenshot if possible)
-* Output description
+As transactions move through the system, you will see metrics being published to CloudWatch, as well as invokes across the included [Lambda](https://aws.amazon.com/lambda/) functions and [Step Functions](https://aws.amazon.com/step-functions/) state machine executions. The Guidance includes [EventBridge](https://aws.amazon.com/eventbridge/) archives, which collect records of events that match [EventBridge](https://aws.amazon.com/eventbridge/) rules.
 
+## Next Steps
 
+Consider subscribing your own business rules engine to the EventBridge event bus and processing inbound transactions using your own logic.
 
-## Next Steps (required)
+- Visit [ServerlessLand](https://serverlessland.com/){:target="_blank"} for more information on building with AWS Serverless services
+- Visit [What is an Event-Driven Architecture?](https://aws.amazon.com/event-driven-architecture/){:target="_blank"} in the AWS documentation for more information about Event-Driven systems
 
-**TODO**
+## Cleanup
 
-Provide suggestions and recommendations about how customers can modify the parameters and the components of the Guidance to further enhance it according to their requirements.
+You can uninstall the 'Guidance for building cross-platform event-driven payment systems on AWS'  manually using the AWS Management Console or by using the Terraform CLI. 
 
+To manually remove the deployed resources, use the [`terraform show` command](https://developer.hashicorp.com/terraform/cli/commands/show) to list the resources that were deployed. Find those resources in the AWS Management Console and delete them. Finally, empty and delete the Terraform state-tracking [S3](https://aws.amazon.com/s3/) bucket.
 
-## Cleanup (required)
+To automatically remove the resources with Terraform, follow these steps:
 
-**TODO**
+1. Empty the the Guidance S3 buckets in the AWS Management Console. WS Guidance\'s Implementations do not automatically delete [S3](https://aws.amazon.com/s3/){:target="_blank"} bucket content in case you have stored data to retain.
+2. To remove the provisoned resources, run the following command from the root of the `/source` directory in the code repository:
 
-- Include detailed instructions, commands, and console actions to delete the deployed Guidance.
-- If the Guidance requires manual deletion of resources, such as the content of an S3 bucket, please specify.
+```bash
+terraform destroy -var="region=<your target region>"
+```
 
+## Revisions
 
+- 1.0.0: Initial Version
 
-## FAQ, known issues, additional considerations, and limitations (optional)
-
-
-**TODO**
-
-**Known issues (optional)**
-
-<If there are common known issues, or errors that can occur during the Guidance deployment, describe the issue and resolution steps here>
-
-
-**Additional considerations (if applicable)**
-
-<Include considerations the customer must know while using the Guidance, such as anti-patterns, or billing considerations.>
-
-**Examples:**
-
-- “This Guidance creates a public AWS bucket required for the use-case.”
-- “This Guidance created an Amazon SageMaker notebook that is billed per hour irrespective of usage.”
-- “This Guidance creates unauthenticated public API endpoints.”
-
-
-Provide a link to the *GitHub issues page* for users to provide feedback.
-
-
-**Example:** *“For any feedback, questions, or suggestions, please use the issues tab under this repo.”*
-
-## Revisions (optional)
-
-Document all notable changes to this project.
-
-Consider formatting this section based on Keep a Changelog, and adhering to Semantic Versioning.
-
-## Notices (optional)
+## Notices
 
 Include a legal disclaimer
 
 *Customers are responsible for making their own independent assessment of the information in this Guidance. This Guidance: (a) is for informational purposes only, (b) represents AWS current product offerings and practices, which are subject to change without notice, and (c) does not create any commitments or assurances from AWS and its affiliates, suppliers or licensors. AWS products or services are provided “as is” without warranties, representations, or conditions of any kind, whether express or implied. AWS responsibilities and liabilities to its customers are controlled by AWS agreements, and this Guidance is not part of, nor does it modify, any agreement between AWS and its customers.*
 
-
 ## Authors (optional)
 
-**TODO**
-
-Name of code contributors
+- Ramesh Mathikumar
+- Rajdeep Banerjee
+- Brian Krygsman
+- Daniel Zilberman
 
 ## Requirements
 
