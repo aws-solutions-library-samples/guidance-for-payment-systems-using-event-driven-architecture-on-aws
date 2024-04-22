@@ -16,9 +16,6 @@ Instead, this sample architecture uses event-driven patterns to post transaction
     - [Operating System](#operating-system)
     - [Third-party tools](#third-party-tools)
     - [Service quotas](#service-quotas)
-3. [Deployment Steps](#deployment-steps)
-4. [Deployment Validation](#deployment-validation)
-5. [Running the Guidance](#running-the-guidance)
 6. [Next Steps](#next-steps)
 7. [Cleanup](#cleanup)
 8. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations)
@@ -138,74 +135,6 @@ Services include:
 ### Service quotas
 
 Experimental workloads should fit within default service quotas for the involved services.
-
-## Deployment Steps
-
-Before you launch the Guidance, review the cost, architecture, security, and other considerations discussed in this guide. Follow the step-by-step instructions in this section to configure and deploy the Guidance into your account.
-
-**Time to deploy:** Approximately 30 minutes
-
-1. Clone the code repository using command:
- ```bash
- git clone https://github.com/aws-solutions-library-samples/guidance-for-building-cross-platform-event-driven-payment-systems-on-aws
- ```
-2. Change directory to the source folder inside the repository: 
-```bash
-cd guidance-for-building-cross-platform-event-driven-payment-systems-on-aws/source
-```
-3. Initialize Terraform using the following command
- ```bash
- terraform init
- ```
-4. To see the resources that will be deployed, run command:
- ```bash
- terraform plan -var="region=<your target region>"
- ```
- - this will not deploy anything to your environment
-5. To actually deploy the guidance sample code, run the following command:
- ```bash
- terraform apply -var="region=<your target region>"
- ```
- Terraform will generate a plan, then prompt you to confirm that you want to deploy the listed resources. Type `yes` if you want to deploy.
-
-## Deployment Validation
-
-When successful, Terraform Outputs the ARN for the DynamoDB input table's stream. It should look something like this: 
-
-```bash
-Apply complete! Resources: 5 added, 7 changed, 5 destroyed.
-
-Outputs:
-
-stream_arn = "arn:aws:dynamodb:us-east-2:111111111111:table/visa/stream/2024-01-04T21:55:22.954"
-```
-
-Confirm your resources were created by logging into the AWS Management console. Make sure you are in the region you specified in the `terraform apply` command. Check for your resources.
-
-* Open the EventBridge console and verify a `payments` Custom Event Bus exists
-
-![Custom EventBridge bus in the AWS Management Console](/assets/images/confirm-eventbridge-bus.png)
-
-* Open the DynamoDB console and verify a `visa` table exists
-
-![DynamoDB table in the AWS Management Console](/assets/images/confirm-dynamodb-table.png)
-
-## Running the Guidance
-
-You can kick off transaction processing by writing a properly-formed record to the `visa` table in [DynamoDB](https://aws.amazon.com/dynamodb/).
-
-The Guidance includes a [Lambda](https://aws.amazon.com/lambda/) function named `visa-mock`, which you can invoke to write sample records to [DynamoDB](https://aws.amazon.com/dynamodb/). You can invoke the function by following these steps:
-
-1. Navigate to the [Lambda service](https://console.aws.amazon.com/lambda/) for your target region in the AWS Management Console
-2. Click on the `visa-mock` function and open the `Test` tab
-3. Specify a new test event, fill out the Event name field, and change the Event JSON to be an empty set of braces: `{}`
-    1. Note: the Event JSON content does not matter, as long at it is valid JSON
-4. Click the `Test` button
-5. You should see an `Executing function: succeeded` message, and no errors in the Log output
-
-![Lambda invoke succeeded](/assets/images/visa-mock-invoke-succeeded.png)
-
-As transactions move through the system, you will see metrics being published to CloudWatch, as well as invokes across the included [Lambda](https://aws.amazon.com/lambda/) functions and [Step Functions](https://aws.amazon.com/step-functions/) state machine executions. The Guidance includes [EventBridge](https://aws.amazon.com/eventbridge/) archives, which collect records of events that match [EventBridge](https://aws.amazon.com/eventbridge/) rules.
 
 ## Next Steps
 
