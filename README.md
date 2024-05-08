@@ -138,6 +138,9 @@ Experimental workloads should fit within default service quotas for the involved
 
 ## Next Steps
 
+Please see the detailed Implementation Guide [here](https://implementationguides.kits.eventoutfitters.aws.dev/cped-payment-1214/compute/cross-platform-event-driven-payment-systems.html) <br/>
+**^^TO BE UPDATED WITH LIVE IG LINK^^**
+
 Consider subscribing your own business rules engine to the EventBridge event bus and processing inbound transactions using your own logic.
 
 - Visit [ServerlessLand](https://serverlessland.com/) for more information on building with AWS Serverless services
