@@ -247,6 +247,7 @@ We see financial services customers using mostly Java and Python. For simplicity
 ## Revisions
 
 - 1.0.0: Initial Version
+- 1.0.1: Reviewed and updated version 5/15/24
 
 ## Notices
 
