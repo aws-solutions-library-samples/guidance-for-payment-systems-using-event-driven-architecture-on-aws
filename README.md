@@ -1,4 +1,4 @@
-# Guidance for building cross-platform event-driven payment systems on AWS
+# Guidance for Building cross-platform event-driven payment systems on AWS
 
 This guidance focuses on payment processing subsystems responsible for posting payments to recieving accounts. In this phase of payment processing, inbound transactions are evaluated, have accounting rules applied to them, then are posted into receiving accounts. The accounting rules dictate the work that needs to happen to successfully process the transaction. Inbound transactions are assumed to have been authorized by an upstream process.
 
@@ -9,22 +9,23 @@ Instead, this sample architecture uses event-driven patterns to post transaction
 ## Table of Contents
 
 1. [Overview](#overview)
-    - [Architecture and Message Flow](#architecture-and-message-flow)
+    - [Architecture and Message Flow](#architecture-and-workflow)
     - [AWS services in this Guidance](#aws-services-in-this-guidance)
     - [Cost](#cost)
 2. [Prerequisites](#prerequisites)
     - [Operating System](#operating-system)
     - [Third-party tools](#third-party-tools)
     - [Service quotas](#service-quotas)
-6. [Next Steps](#next-steps)
-7. [Cleanup](#cleanup)
-8. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations)
+3. [Deployment Instructions](#deployment-instructions)
+4. [Next Steps](#next-steps)
+<!-- 5  [Cleanup](#cleanup) -->
+5. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations)
     - [Functional Requirements](#what-were-the-functional-requirements-guiding-design-of-the-system)
     - [Non-Functional Requirements](#what-were-the-non-functional-requirements-guiding-design-of-the-system)
     - [Architecture Decision Register](#what-were-the-architectural-decisions-made-along-the-way-architecture-decision-register)
-9. [Revisions](#revisions)
-10. [Notices](#notices)
-11. [Authors](#authors)
+6. [Revisions](#revisions)
+7. [Notices](#notices)
+8. [Authors](#authors)
 
 ## Overview
 
@@ -36,30 +37,30 @@ In traditional architectures, the upstream system writes transactions to a log. 
 
 This sample architecture uses event-driven patterns to post transactions in near real-time rather than in batches. In this system, customers get a more fine-grained account balance, they can dispute transactions much sooner, and processing load is offloaded from batch systems during critical hours.
 
-### Architecture and Message Flow
+### Architecture and Workflow
 
 <!-- ![Architecture Diagram](./assets/images/architecture-annotated.png) -->
 ![Architecture Diagram](./assets/images/event-driven-payment-systems-reference-architecture-updated.png)
 
 1. A user initiates a payment which the authorization application approves and persists to an [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) table.
 
-2. An [Amazon EventBridge](https://aws.amazon.com/eventbridge/) Pipe reads approved authorization records from the [DynamoDB](https://aws.amazon.com/dynamodb/) table stream and publishes events to an EventBridge custom bus.
+2. An [Amazon EventBridge](https://aws.amazon.com/eventbridge/) Pipe reads approved authorization records from the DynamoDB table stream and publishes events to an EventBridge custom bus.
 
-3. Duplicate-checking logic can be added to the [EventBridge](https://aws.amazon.com/eventbridge/) Pipe through a deduplication [AWS Lambda](https://aws.amazon.com/lambda/) function.
+3. Duplicate-checking logic can be added to the EventBridge Pipe through a deduplication [AWS Lambda](https://aws.amazon.com/lambda/) function.
 
-4. An [EventBridge](https://aws.amazon.com/eventbridge/) rule invokes an enrichment [Lambda](https://aws.amazon.com/lambda/) function for events that match to add context like account type and bank details.
+4. An EventBridge rule invokes the enrichment Lambda function for events that match to add context like account type and bank details.
 
-5. The [Lambda](https://aws.amazon.com/lambda/) function queries metadata and publishes a new event back to the [EventBridge](https://aws.amazon.com/eventbridge/) custom bus with extra info.
+5. The enrichment Lambda function queries metadata and publishes a new event back to the EventBridge custom bus with extra info.
 
-6. An [EventBridge](https://aws.amazon.com/eventbridge/) rule watching for enriched events invokes an [AWS Step Functions](https://aws.amazon.com/step-functions/) state machine to apply business rules to the event as part of a rules engine. In this case the [Step Function](https://aws.amazon.com/step-functions/) state machine is representative of any rules engine, such as Drools or similar.
+6. An EventBridge rule watching for enriched events invokes an [AWS Step Functions](https://aws.amazon.com/step-functions/) workflow to apply business rules to the event as part of a rules engine. In this case the Step Function "state machine" is representative of any rules engine, such as Drools or similar.
 
-7. When an event passes all business rules, the [Step Functions](https://aws.amazon.com/step-functions/) state machine publishes a new event back to the [EventBridge](https://aws.amazon.com/eventbridge/) bus.
+7. When an event passes all business rules, the Step Functions workflow publishes a new event back to the EventBridge bus.
 
-8. An [EventBridge](https://aws.amazon.com/eventbridge/) rule enqueues a message in an [Amazon Simple Queue Service](https://aws.amazon.com/sqs/) (SQS) queue as a buffer to avoid overrunning the downstream posting subsystem.
+8. An EventBridge rule enqueues a message in an [Amazon Simple Queue Service (SQS)](https://aws .amazon.com/sqs/) queue as a buffer to avoid overrunning the downstream posting subsystem.
 
-9. A [Lambda](https://aws.amazon.com/lambda/) function reads from the [SQS](https://aws.amazon.com/sqs/) queue and invokes the downstream posting subsystem to post the transaction.
+9. The posting Lambda function reads from the SQS queue and invokes the downstream posting subsystem to post the transaction.
 
-10. The [Lambda](https://aws.amazon.com/lambda/) function publishes a final event back to the [EventBridge](https://aws.amazon.com/eventbridge/) bus.
+10. The posting Lambda function publishes a final event back to the EventBridge custom event bus.
 
 ### AWS services in this Guidance
 
@@ -136,16 +137,18 @@ Services include:
 
 Experimental workloads should fit within default service quotas for the involved services.
 
+## Deployment Instructions
+TO DO - UPDATE WITH LIVE IG LINK
+Please see detailed deployment, validation and cleanup instructions in the [Implementation Guide](https://implementationguides.kits.eventoutfitters.aws.dev/cped-payment-1214/compute/cross-platform-event-driven-payment-systems.html)
+
 ## Next Steps
 
-Please see the detailed Implementation Guide [here](https://implementationguides.kits.eventoutfitters.aws.dev/cped-payment-1214/compute/cross-platform-event-driven-payment-systems.html) <br/>
-**^^TO BE UPDATED WITH LIVE IG LINK^^**
-
-Consider subscribing your own business rules engine to the EventBridge event bus and processing inbound transactions using your own logic.
+PLease consider subscribing your own business rules engine to the EventBridge event bus and processing inbound transactions using your own logic.
 
 - Visit [ServerlessLand](https://serverlessland.com/) for more information on building with AWS Serverless services
 - Visit [What is an Event-Driven Architecture?](https://aws.amazon.com/event-driven-architecture/) in the AWS documentation for more information about Event-Driven systems
 
+<!--
 ## Cleanup
 
 You can uninstall the 'Guidance for building cross-platform event-driven payment systems on AWS'  manually using the AWS Management Console or by using the Terraform CLI. 
@@ -160,6 +163,7 @@ To automatically remove the resources with Terraform, follow these steps:
 ```bash
 terraform destroy -var="region=<your target region>"
 ```
+-->
 
 ## FAQ, known issues, additional considerations, and limitations
 
@@ -250,7 +254,7 @@ We see financial services customers using mostly Java and Python. For simplicity
 
 ## Authors
 
-- Ramesh Mathikumar
-- Rajdeep Banerjee
-- Brian Krygsman
-- Daniel Zilberman
+- Ramesh Mathikumar, Pr. DevOps Consultant
+- Rajdeep Banerjee, Pr. Slutions Architect
+- Brian Krygsman, Sr. Solutions Architect
+- Daniel Zilberman, Sr. Solutions Architect Technical Solutions
