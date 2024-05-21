@@ -256,6 +256,6 @@ We see financial services customers using mostly Java and Python. For simplicity
 ## Authors
 
 - Ramesh Mathikumar, Sr. DevOps Consultant
-- Rajdeep Banerjee, Sr. Slutions Architect
+- Rajdeep Banerjee, Sr. Solutions Architect
 - Brian Krygsman, Sr. Solutions Architect
 - Daniel Zilberman, Sr. Solutions Architect Technical Solutions
