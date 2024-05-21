@@ -143,7 +143,7 @@ Please see detailed deployment, validation and cleanup instructions in the [Impl
 
 ## Next Steps
 
-PLease consider subscribing your own business rules engine to the EventBridge event bus and processing inbound transactions using your own logic.
+Please consider subscribing your own business rules engine to the EventBridge event bus and processing inbound transactions using your own logic.
 
 - Visit [ServerlessLand](https://serverlessland.com/) for more information on building with AWS Serverless services
 - Visit [What is an Event-Driven Architecture?](https://aws.amazon.com/event-driven-architecture/) in the AWS documentation for more information about Event-Driven systems
@@ -255,7 +255,7 @@ We see financial services customers using mostly Java and Python. For simplicity
 
 ## Authors
 
-- Ramesh Mathikumar, Pr. DevOps Consultant
-- Rajdeep Banerjee, Pr. Slutions Architect
+- Ramesh Mathikumar, Sr. DevOps Consultant
+- Rajdeep Banerjee, Sr. Slutions Architect
 - Brian Krygsman, Sr. Solutions Architect
 - Daniel Zilberman, Sr. Solutions Architect Technical Solutions
