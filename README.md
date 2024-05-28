@@ -95,7 +95,7 @@ The following table provides a sample cost breakdown for deploying this Guidance
 | [AWS Lambda](https://aws.amazon.com/lambda/pricing/) | 3,000 requests per month with 200 ms avg duration, 128 MB memory, 512 MB ephemeral storage | \$ 0.00 |
 | [Amazon SQS](https://aws.amazon.com/sqs/pricing/) | 0.03 million requests per month | \$ 0.00 |
 | [AWS Step Functions](https://aws.amazon.com/step-functions/pricing/) | 3,000 workflow requests per month with 3 state transitions per workflow | \$ 0.13 |
-| [Amazon SNS](https://aws.amazon.com/sns/pricing/)| 3,000 requests users nd 3000 Email notifications per month | \$ 0.04 |
+| [Amazon SNS](https://aws.amazon.com/sns/pricing/)| 3,000 requests users and 3000 Email notifications per month | \$ 0.04 |
 | [Amazon EventBridge](https://aws.amazon.com/eventbridge/pricing/) | 3,000 custom events per month with 3000 events replay and 3000 requests in the pipes | \$ 0.00 |
 |**Total estimated cost per month:**| | **\$1** |
 
