@@ -56,7 +56,7 @@ This sample architecture uses event-driven patterns to post transactions in near
 
 7. When an event passes all business rules, the Step Functions workflow publishes a new event back to the EventBridge bus.
 
-8. An EventBridge rule enqueues a message in an [Amazon Simple Queue Service (SQS)](https://aws .amazon.com/sqs/) queue as a buffer to avoid overrunning the downstream posting subsystem.
+8. An EventBridge rule enqueues a message in an [Amazon Simple Queue Service (SQS)](https://aws.amazon.com/sqs/) queue as a buffer to avoid overrunning the downstream posting subsystem.
 
 9. The posting Lambda function reads from the SQS queue and invokes the downstream posting subsystem to post the transaction.
 
@@ -250,6 +250,7 @@ We see financial services customers using mostly Java and Python. For simplicity
 
 - 1.0.0: Initial Version
 - 1.0.1: Reviewed and updated version 5/15/24
+- 1.0.2: Pre publication revision 5/29/24
 
 ## Notices
 
