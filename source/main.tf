@@ -460,7 +460,7 @@ resource "aws_cloudformation_stack" "guidance_deployment_metrics" {
     template_body = <<STACK
     {
         "AWSTemplateFormatVersion": "2010-09-09",
-        "Description": "AWS Guidance ID (SO123456)",
+        "Description": "Tis is Guidance for Building Payment Systems Using Event-Driven Architecture (SO9470)",
         "Resources": {
             "EmptyResource": {
                 "Type": "AWS::CloudFormation::WaitConditionHandle"
