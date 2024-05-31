@@ -236,7 +236,13 @@ At this time, we assume that cloudwatch+cloudtrail is sufficient for logging/aud
 
 #### How is this PCI- (etc.) compliant? 
 
-We assume all inbound records are pre-tokenized. This will be described in our event schemas. All included services are in scope for PCI/etc. Customer-managed keys will be for encryption wherever possible.
+We assume all inbound records are pre-tokenized. This will be described in our event schemas. For an example of how to achieve this, customers can refer to [this blog post](https://aws.amazon.com/blogs/compute/building-a-serverless-tokenization-solution-to-mask-sensitive-data/).
+
+All included services are [in scope for PCI-DSS](https://aws.amazon.com/compliance/pci-dss-level-1-faqs/). Customer-managed keys should be used for encryption wherever possible. Data at both rest and in flight will be encrypted. DynamoDB streams are encrypted with a table-level encryption key. For SQS, customers can protect data in transit using Secure Sockets Layer (SSL) or client-side encryption. By default, Amazon SQS stores messages and files using disk encryption. Customers can protect data at rest by configuring SQS to encrypt your messages before saving them to the encrypted file system. SQS recommends using Server-side encryption (SSE) for optimized data encryption. Additionally, SNS lets you store sensitive data in encrypted topics by protecting the contents using keys managed in Key Management Service (KMS). When SSE is configured for SNS, messages are encrypted as soon as SNS receives them. The messages are stored in encrypted form, and only decrypted when they are sent.
+
+As key fields from the inbound authorization are fully tokenized, they pass through the work flow using the controls mentioned above.
+
+Additional security guidance can be found in the [Security pillar](https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/) of the AWS Well Architected Framework and the [Architecture Center](https://aws.amazon.com/architecture/security-identity-compliance/).
 
 #### What is the defined blast radius for cloud provider impact? 
 
