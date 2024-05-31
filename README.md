@@ -234,7 +234,7 @@ We have one in place at this time, but are only using it for duplicate checks fo
 
 At this time, we assume that cloudwatch+cloudtrail is sufficient for logging/auditing purposes, unless requirements change.
 
-#### How is this PCI- (etc.) compliant? 
+#### How is this PCI-DSS compliant? 
 
 We assume all inbound records are pre-tokenized. This will be described in our event schemas. For an example of how to achieve this, customers can refer to [this blog post](https://aws.amazon.com/blogs/compute/building-a-serverless-tokenization-solution-to-mask-sensitive-data/).
 
