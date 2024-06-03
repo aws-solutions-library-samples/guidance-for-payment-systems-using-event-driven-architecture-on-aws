@@ -149,7 +149,7 @@ Please see detailed deployment, validation and cleanup instructions in the [Impl
 
 ## Next Steps
 
-Please consider subscribing your own business rules engine to the EventBridge event bus and processing inbound transactions using your own logic.
+Consider subscribing your own business rules engine to the EventBridge event bus and processing inbound transactions using your own logic.
 
 - Visit [ServerlessLand](https://serverlessland.com/) for more information on building with AWS Serverless services
 - Visit [What is an Event-Driven Architecture?](https://aws.amazon.com/event-driven-architecture/) in the AWS documentation for more information about Event-Driven systems
