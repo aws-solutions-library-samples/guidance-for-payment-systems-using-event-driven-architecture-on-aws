@@ -107,7 +107,7 @@ A sample cost breakdown for production-like load (around 20 mln requests/month) 
 
 These deployment instructions are optimized to work on Amazon Linux 2 or Mac OSX.
 
-This solution builds AWS Lambda functions using Python. The build process currently supports Linux and MacOS. It was tested with Python `3.11`. You will need [Python and Pip](https://www.python.org/) to build and deploy.
+This solution builds [Lambda](https://aws.amazon.com/lambda/) functions using Python. The build process currently supports Linux and MacOS. It was tested with Python `3.11`. You will need [Python and Pip](https://www.python.org/) to build and deploy.
 
 ### Third-party tools
 
@@ -119,6 +119,10 @@ You can install Terraform on Linux (such as a CodeBuild build agent) with comman
 curl -o terraform_1.7.1_linux_amd64.zip https://releases.hashicorp.com/terraform/1.7.1/terraform_1.7.1_linux_amd64.zip
 unzip -o terraform_1.7.1_linux_amd64.zip && mv terraform /usr/bin
 ```
+
+The solution is deployed as one Terraform config. The Root HCL config file (main.tf) dictates the flow and all the submodules are bundled under this repo in individual folders (for example `/sqs` for the sqs module). Lambda code can be found under the `/src` folder.
+
+The solution uses a local [Terraform backend](https://developer.hashicorp.com/terraform/language/settings/backends/configuration) for deployment simplicity. You may want to switch to a shared backend like S3 for collaboration, or when using a CI/CD pipeline.
 
 ### AWS account requirements
 
