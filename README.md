@@ -144,8 +144,8 @@ Services include:
 Experimental workloads should fit within default service quotas for the involved services.
 
 ## Deployment Instructions
-TO DO - UPDATE WITH LIVE IG LINK
-Please see detailed deployment, validation and cleanup instructions in the [Implementation Guide](https://implementationguides.kits.eventoutfitters.aws.dev/cped-payment-1214/compute/cross-platform-event-driven-payment-systems.html)
+
+Please see detailed deployment, validation and cleanup instructions in the [Implementation Guide](https://aws-solutions-library-samples.github.io/compute/building-payment-systems-using-event-driven-architecture-on-aws.html)
 
 ## Next Steps
 
