@@ -18,7 +18,6 @@ Instead, this sample architecture uses event-driven patterns to post transaction
     - [Service quotas](#service-quotas)
 3. [Deployment Instructions](#deployment-instructions)
 4. [Next Steps](#next-steps)
-<!-- 5  [Cleanup](#cleanup) -->
 5. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations)
     - [Functional Requirements](#what-were-the-functional-requirements-guiding-design-of-the-system)
     - [Non-Functional Requirements](#what-were-the-non-functional-requirements-guiding-design-of-the-system)
@@ -63,19 +62,18 @@ This sample architecture uses event-driven patterns to post transactions in near
 10. The posting Lambda function publishes a final event back to the EventBridge custom event bus.
 
 ### AWS services in this Guidance
-
-| **AWS service**  | Description |
-|-----------|------------|
-| [Amazon Eventbridge](https://aws.amazon.com/eventbridge/) | Core. An EventBridge custom event bus is is paired with EventBridge rules to route transaction processing events to subscribed components. The emitted events describe the lifecyle of transactions as they move through the system. Additionally, an EventBridge pipe is used to consume the inbound transaction stream and publish events to the event bus. |
-| [AWS Lambda](https://aws.amazon.com/lambda/) | Core. Runs custom code in response to events. This guidance includes a sample duplication detection function, a transaction enrichment function, a sample posting system integration function, and others. |
-| [Amazon Simple Queue Service (SQS)](https://aws.amazon.com/sqs/) | Core. Used as a durable buffer for when we need to capture events from rules, but need to govern scale-out. |
-| [Amazon Simple Storage Service (S3)](https://aws.amazon.com/s3/) | Core. Stores audit and transaction logs captured by EventBridge archives. |
-| [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) | Core. Acts as one possible ingest method for inbound transactions. Transactions are written to a DynamoDB table, which pushes records onto a DynamoDB stream. The stream records are published to the EventBridge event bus to start the processing lifecycle. |
-| [AWS Step Functions](https://aws.amazon.com/step-functions/) | Supporting. Implements a simple business rules system, triggering alternate processing paths for transactions with unique characteristics. This could be implemented by alternate business rules systems like [Drools](https://www.drools.org/). |
-| [Amazon CloudWatch](https://aws.amazon.com/cloudwatch/) | Supporting. Monitors system health via metrics and logs. |
-| [AWS X-Ray](https://aws.amazon.com/xray/) | Supporting. Traces transaction processing across components. |
-| [AWS Identity and Access Management (IAM)](https://aws.amazon.com/iam/) | Supporting. Defines roles and access policies between components in the system. |
-| [AWS Key Management Service (KMS)](https://aws.amazon.com/kms/) | Supporting. Manages encryption of transaction data. |
+| **AWS service**  | Role|  Description |
+|-----------|------------|------------|
+| [Amazon Eventbridge](https://aws.amazon.com/eventbridge/) | Core | An EventBridge custom event bus is paired with EventBridge rules to route transaction processing events to subscribed components. The emitted events describe the lifecycle of transactions as they move through the system. Additionally, an EventBridge pipe is used to consume the inbound transaction stream and publish events to the event bus. |
+| [AWS Lambda](https://aws.amazon.com/lambda/) | Core | Runs custom code in response to events. This guidance includes a sample duplication detection function, a transaction enrichment function, a sample posting system integration function, and others. |
+| [Amazon Simple Queue Service (Amazon SQS)](https://aws.amazon.com/sqs/) | Core | Used as a durable buffer for when you need to capture events from rules and also need to govern scale-out. |
+| [Amazon Simple Storage Service (Amazon S3)](https://aws.amazon.com/s3/) | Core | Stores audit and transaction logs captured by EventBridge archives. |
+| [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) | Core | Acts as a possible ingest method for inbound transactions. Transactions are written to a DynamoDB table, which pushes records onto a DynamoDB stream. The stream records are published to the EventBridge event bus to start the processing lifecycle. |
+| [AWS Step Functions](https://aws.amazon.com/step-functions/) | Supporting | Implements a simple business rules system, initiaiting alternate processing paths for transactions with unique characteristics. This could be implemented by alternate business rules systems like [Drools](https://www.drools.org/). |
+| [Amazon CloudWatch](https://aws.amazon.com/cloudwatch/) | Supporting | Monitors system health through metrics and logs. |
+| [AWS X-Ray](https://aws.amazon.com/xray/) | Supporting | Traces transaction processing across components. |
+| [AWS Identity and Access Management (IAM)](https://aws.amazon.com/iam/) | Supporting | Defines roles and access policies between components in the system. |
+| [AWS Key Management Service (AWS KMS)](https://aws.amazon.com/kms/) | Supporting | Manages encryption of transaction data. |
 
 ### Cost
 
@@ -99,7 +97,7 @@ The following table provides a sample cost breakdown for deploying this Guidance
 | [Amazon EventBridge](https://aws.amazon.com/eventbridge/pricing/) | 3,000 custom events per month with 3000 events replay and 3000 requests in the pipes | \$ 0.00 |
 |**Total estimated cost per month:**| | **\$1** |
 
-A sample cost breakdown for production-like load (around 20 mln requests/month) can be found in this [AWS Pricing Calculator estimate](https://calculator.aws/#/estimate?id=ff3373df6fb3eb3856fe263a3390ca96f9598c79) and is esitimated around **$1,811.15 USD/month**
+A sample cost breakdown for production scale load (around 20 mln requests/month) can be found in this [AWS Pricing Calculator estimate](https://calculator.aws/#/estimate?id=ff3373df6fb3eb3856fe263a3390ca96f9598c79) and is esitimated around **$1,811.15 USD/month**
 
 ## Prerequisites
 
@@ -154,22 +152,6 @@ Consider subscribing your own business rules engine to the EventBridge event bus
 - Visit [ServerlessLand](https://serverlessland.com/) for more information on building with AWS Serverless services
 - Visit [What is an Event-Driven Architecture?](https://aws.amazon.com/event-driven-architecture/) in the AWS documentation for more information about Event-Driven systems
 
-<!--
-## Cleanup
-
-You can uninstall the 'Guidance for building cross-platform event-driven payment systems on AWS'  manually using the AWS Management Console or by using the Terraform CLI. 
-
-To manually remove the deployed resources, use the [`terraform show` command](https://developer.hashicorp.com/terraform/cli/commands/show) to list the resources that were deployed. Find those resources in the AWS Management Console and delete them. Finally, empty and delete the Terraform state-tracking [S3](https://aws.amazon.com/s3/) bucket.
-
-To automatically remove the resources with Terraform, follow these steps:
-
-1. Empty the the Guidance S3 buckets in the AWS Management Console. WS Guidance\'s Implementations do not automatically delete [S3](https://aws.amazon.com/s3/) bucket content in case you have stored data to retain.
-2. To remove the provisoned resources, run the following command from the root of the `/source` directory in the code repository:
-
-```bash
-terraform destroy -var="region=<your target region>"
-```
--->
 
 ## FAQ, known issues, additional considerations, and limitations
 
