@@ -40,7 +40,7 @@ This sample architecture uses event-driven patterns to post transactions in near
 ### Architecture and Workflow
 
 <!-- ![Architecture Diagram](./assets/images/architecture-annotated.png) -->
-![Architecture Diagram](./assets/images/event-driven-payment-systems-reference-architecture-updated.png)
+![Architecture Diagram](assets/images/building-real-time-payment-systems-using-event-driven-architecture-on-aws.png)
 
 1. A user initiates a payment which the authorization application approves and persists to an [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) table.
 
@@ -261,7 +261,7 @@ We see financial services customers using mostly Java and Python. For simplicity
 - 1.0.0: Initial Version
 - 1.0.1: Reviewed and updated version 5/15/24
 - 1.0.2: Pre publication revision 5/29/24
-- 1.0.3: Publication version 6/7/24
+- 1.0.3: Publication version 6/11/24
 
 ## Notices
 
