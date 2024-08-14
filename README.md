@@ -97,7 +97,7 @@ The following table provides a sample cost breakdown for deploying this guidance
 | [Amazon EventBridge](https://aws.amazon.com/eventbridge/pricing/) | 3,000 custom events per month with 3000 events replay and 3000 requests in the pipes | \$ 0.00 |
 |**Total estimated cost per month:**| | **\$1** |
 
-A sample cost breakdown for production scale load (around 20 mln requests/month) can be found in this [AWS Pricing Calculator estimate](https://calculator.aws/#/estimate?id=ff3373df6fb3eb3856fe263a3390ca96f9598c79) and is esitimated around **$1,811.15 USD/month**
+A sample cost breakdown for production scale load (around 20 mln requests/month) can be found in this [AWS Pricing Calculator estimate](https://calculator.aws/#/estimate?id=ff3373df6fb3eb3856fe263a3390ca96f9598c79) and is estimated around **$1,811.15 USD/month**
 
 ## Prerequisites
 
