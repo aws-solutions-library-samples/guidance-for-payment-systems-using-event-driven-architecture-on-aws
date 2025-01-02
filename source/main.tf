@@ -3,6 +3,7 @@ provider "aws" {
 }
 
 provider "random" {}
+data "aws_caller_identity" "current" {}
 
 locals {
   definition_template = <<EOF
@@ -203,6 +204,10 @@ locals {
   }
 }
 EOF
+tags = {
+    Name        = "payments"
+    Environment = "PROD"
+  }
 }
 
 
@@ -369,6 +374,20 @@ module "fx_lambda" {
   
 }
 
+module "kms" {
+  source      = "terraform-aws-modules/kms/aws"
+  version     = "~> 1.0"
+  description = "Securing SFN with KMS Keys"
+
+  # Aliases
+  aliases                 = ["realtimepayments"]
+  aliases_use_name_prefix = true
+
+  key_owners = [data.aws_caller_identity.current.arn]
+
+  tags = local.tags
+}
+
 module "sfn" {
   source = "./stepfunction"
 
@@ -378,6 +397,12 @@ module "sfn" {
 
   definition = local.definition_template
   publish    = true
+
+  encryption_configuration = {
+    type                              = "CUSTOMER_MANAGED_KMS_KEY"
+    kms_key_id                        = module.kms.key_arn
+    kms_data_key_reuse_period_seconds = 600
+  }
 
   logging_configuration = {
     include_execution_data = true
