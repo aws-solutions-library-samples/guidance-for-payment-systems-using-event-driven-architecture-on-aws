@@ -230,6 +230,7 @@ module "dynamodb" {
 module "event_bridge" {
   source            = "./event_bridge"
   event_bridge_name = var.event_bridge_name
+  kms_key_id        = module.kms.key_arn
   posting_queue_arn = module.posting_queue.arn
   posted_queue_arn  = module.posted_queue.arn
   enrich_lambda_arn = module.enrich_lambda.arn
