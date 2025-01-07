@@ -51,3 +51,9 @@ variable "state_machine_arn" {
   default     = ""
   description = "Pass the State Machine arn"
 }
+
+variable "kms_key_identifier" {
+  description = "Pass the ARN of the KMS Key Id for CMK"
+  type        = string
+  default     = null
+}

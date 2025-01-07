@@ -45,7 +45,8 @@ locals {
   }
 }
 resource "aws_cloudwatch_event_bus" "this" {
-  name = var.event_bridge_name
+  name               = var.event_bridge_name
+  kms_key_identifier = var.kms_key_id
 }
 
 resource "aws_schemas_discoverer" "this" {
