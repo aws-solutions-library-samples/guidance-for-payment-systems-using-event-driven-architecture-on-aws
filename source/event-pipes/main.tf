@@ -58,6 +58,28 @@ resource "aws_iam_role_policy" "target" {
   })
 }
 
+resource "aws_iam_role_policy" "kms" {
+  role = aws_iam_role.this.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ],
+        Resource = [
+          "*"
+        ]
+      },
+    ]
+  })
+}
+
 resource "aws_iam_role_policy" "invoke_dedup" {
   role = aws_iam_role.this.id
   policy = jsonencode({
@@ -81,6 +103,7 @@ resource "aws_pipes_pipe" "this" {
   role_arn = aws_iam_role.this.arn
   source   = var.stream_arn
   target   = var.eb_arn
+  kms_key_identifier = var.kms_key_id
   #target = "arn:aws:events:eu-west-1:926516876030:event-bus/default"
 
   source_parameters {
