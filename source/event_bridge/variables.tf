@@ -52,7 +52,7 @@ variable "state_machine_arn" {
   description = "Pass the State Machine arn"
 }
 
-variable "kms_key_identifier" {
+variable "kms_key_id" {
   description = "Pass the ARN of the KMS Key Id for CMK"
   type        = string
   default     = null
