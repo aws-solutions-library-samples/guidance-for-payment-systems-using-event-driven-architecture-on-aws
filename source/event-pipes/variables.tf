@@ -27,3 +27,9 @@ variable "target_event_source" {
   description = "Source property of the event published to the target."
   default     = null
 }
+
+variable "kms_key_id" {
+  description = "Pass the ARN of the KMS Key Id for CMK"
+  type        = string
+  default     = null
+}
