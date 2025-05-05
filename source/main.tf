@@ -269,6 +269,7 @@ module "event-pipes" {
   stream_arn               = module.dynamodb.stream_arn
   eb_arn                   = module.event_bridge.arn
   lambda_arn               = module.dedup_lambda.arn
+  kms_key_id               = module.kms.key_arn
   target_event_detail_type = "TransactionAuthorized"
   target_event_source      = "octank.payments.posting.visaIngest"
 }
@@ -384,8 +385,39 @@ module "kms" {
   aliases                 = ["realtimepayments"]
   aliases_use_name_prefix = true
 
-  key_owners = [data.aws_caller_identity.current.arn]
-
+  #key_owners = [data.aws_caller_identity.current.arn]
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Id      = "default",
+    Statement = [
+      {
+        Sid    = "Enable IAM User Permissions"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowEventBridgeToGenerateDataKey",
+        Effect = "Allow",
+        Principal = {
+          #Service = "events.amazonaws.com"
+          Service = ["events.amazonaws.com", "pipes.amazonaws.com"]
+        },
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ]
+        Resource = "*" 
+      }
+    ]
+  })
+  
   tags = local.tags
 }
 
