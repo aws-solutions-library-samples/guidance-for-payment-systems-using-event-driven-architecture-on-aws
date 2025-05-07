@@ -404,7 +404,7 @@ module "kms" {
         Effect = "Allow",
         Principal = {
           #Service = "events.amazonaws.com"
-          Service = ["events.amazonaws.com", "pipes.amazonaws.com"]
+          Service = ["events.amazonaws.com", "pipes.amazonaws.com", "states.amazonaws.com"]
         },
         Action = [
           "kms:Encrypt",

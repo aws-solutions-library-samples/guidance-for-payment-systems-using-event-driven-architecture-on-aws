@@ -15,6 +15,15 @@ locals {
       }
     }
 
+    kms = {
+      kms = {
+        actions = [
+          "kms:*"
+        ]
+        default_resources = ["*"]
+      }
+    }
+
     stepfunction = {
       stepfunction = {
         actions = [
