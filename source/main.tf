@@ -379,7 +379,7 @@ module "fx_lambda" {
 module "kms" {
   source      = "terraform-aws-modules/kms/aws"
   version     = "~> 1.0"
-  description = "Securing SFN with KMS Keys"
+  description = "Securing SFN and EventBridge with KMS Keys"
 
   # Aliases
   aliases                 = ["realtimepayments"]
@@ -400,7 +400,7 @@ module "kms" {
         Resource = "*"
       },
       {
-        Sid    = "AllowEventBridgeToGenerateDataKey",
+        Sid    = "AllowSFNEventBridgeToGenerateDataKey",
         Effect = "Allow",
         Principal = {
           #Service = "events.amazonaws.com"
