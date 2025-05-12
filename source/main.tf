@@ -448,6 +448,10 @@ module "sfn" {
       xray = true
     }
 
+    kms = {
+      kms = true
+    }
+
     stepfunction = {
       stepfunction = true
     }
