@@ -3,6 +3,7 @@ provider "aws" {
 }
 
 provider "random" {}
+data "aws_caller_identity" "current" {}
 
 locals {
   definition_template = <<EOF
@@ -203,6 +204,10 @@ locals {
   }
 }
 EOF
+tags = {
+    Name        = "payments"
+    Environment = "PROD"
+  }
 }
 
 
@@ -225,6 +230,7 @@ module "dynamodb" {
 module "event_bridge" {
   source            = "./event_bridge"
   event_bridge_name = var.event_bridge_name
+  kms_key_id        = module.kms.key_arn
   posting_queue_arn = module.posting_queue.arn
   posted_queue_arn  = module.posted_queue.arn
   enrich_lambda_arn = module.enrich_lambda.arn
@@ -263,6 +269,7 @@ module "event-pipes" {
   stream_arn               = module.dynamodb.stream_arn
   eb_arn                   = module.event_bridge.arn
   lambda_arn               = module.dedup_lambda.arn
+  kms_key_id               = module.kms.key_arn
   target_event_detail_type = "TransactionAuthorized"
   target_event_source      = "octank.payments.posting.visaIngest"
 }
@@ -369,6 +376,51 @@ module "fx_lambda" {
   
 }
 
+module "kms" {
+  source      = "terraform-aws-modules/kms/aws"
+  version     = "~> 1.0"
+  description = "Securing SFN and EventBridge with KMS Keys"
+
+  # Aliases
+  aliases                 = ["realtimepayments"]
+  aliases_use_name_prefix = true
+
+  #key_owners = [data.aws_caller_identity.current.arn]
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Id      = "default",
+    Statement = [
+      {
+        Sid    = "Enable IAM User Permissions"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowSFNEventBridgeToGenerateDataKey",
+        Effect = "Allow",
+        Principal = {
+          #Service = "events.amazonaws.com"
+          Service = ["events.amazonaws.com", "pipes.amazonaws.com", "states.amazonaws.com"]
+        },
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ]
+        Resource = "*" 
+      }
+    ]
+  })
+  
+  tags = local.tags
+}
+
 module "sfn" {
   source = "./stepfunction"
 
@@ -379,6 +431,12 @@ module "sfn" {
   definition = local.definition_template
   publish    = true
 
+  encryption_configuration = {
+    type                              = "CUSTOMER_MANAGED_KMS_KEY"
+    kms_key_id                        = module.kms.key_arn
+    kms_data_key_reuse_period_seconds = 600
+  }
+
   logging_configuration = {
     include_execution_data = true
     level                  = "ALL"
@@ -388,6 +446,10 @@ module "sfn" {
 
     xray = {
       xray = true
+    }
+
+    kms = {
+      kms = true
     }
 
     stepfunction = {
