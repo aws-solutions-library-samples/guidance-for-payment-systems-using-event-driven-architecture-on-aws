@@ -1,4 +1,4 @@
-# Guidance for Building cross-platform event-driven payment systems on AWS
+# Guidance for Building Transaction Posting Systems Using Event-Driven Architecture on AWS
 
 This guidance focuses on payment processing subsystems responsible for posting payments to recieving accounts. In this phase of payment processing, inbound transactions are evaluated, have accounting rules applied to them, then are posted into receiving accounts. The accounting rules dictate the work that needs to happen to successfully process the transaction. Inbound transactions are assumed to have been authorized by an upstream process.
 
@@ -18,7 +18,6 @@ Instead, this sample architecture uses event-driven patterns to post transaction
     - [Service quotas](#service-quotas)
 3. [Deployment Instructions](#deployment-instructions)
 4. [Next Steps](#next-steps)
-<!-- 5  [Cleanup](#cleanup) -->
 5. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations)
     - [Functional Requirements](#what-were-the-functional-requirements-guiding-design-of-the-system)
     - [Non-Functional Requirements](#what-were-the-non-functional-requirements-guiding-design-of-the-system)
@@ -40,7 +39,7 @@ This sample architecture uses event-driven patterns to post transactions in near
 ### Architecture and Workflow
 
 <!-- ![Architecture Diagram](./assets/images/architecture-annotated.png) -->
-![Architecture Diagram](./assets/images/event-driven-payment-systems-reference-architecture-updated.png)
+![Architecture Diagram](assets/images/building-real-time-payment-systems-using-event-driven-architecture-on-aws.png)
 
 1. A user initiates a payment which the authorization application approves and persists to an [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) table.
 
@@ -56,38 +55,37 @@ This sample architecture uses event-driven patterns to post transactions in near
 
 7. When an event passes all business rules, the Step Functions workflow publishes a new event back to the EventBridge bus.
 
-8. An EventBridge rule enqueues a message in an [Amazon Simple Queue Service (SQS)](https://aws .amazon.com/sqs/) queue as a buffer to avoid overrunning the downstream posting subsystem.
+8. An EventBridge rule enqueues a message in an [Amazon Simple Queue Service (SQS)](https://aws.amazon.com/sqs/) queue as a buffer to avoid overrunning the downstream posting subsystem.
 
 9. The posting Lambda function reads from the SQS queue and invokes the downstream posting subsystem to post the transaction.
 
 10. The posting Lambda function publishes a final event back to the EventBridge custom event bus.
 
 ### AWS services in this Guidance
-
-| **AWS service**  | Description |
-|-----------|------------|
-| [Amazon Eventbridge](https://aws.amazon.com/eventbridge/) | Core. An EventBridge custom event bus is is paired with EventBridge rules to route transaction processing events to subscribed components. The emitted events describe the lifecyle of transactions as they move through the system. Additionally, an EventBridge pipe is used to consume the inbound transaction stream and publish events to the event bus. |
-| [AWS Lambda](https://aws.amazon.com/lambda/) | Core. Runs custom code in response to events. This guidance includes a sample duplication detection function, a transaction enrichment function, a sample posting system integration function, and others. |
-| [Amazon Simple Queue Service (SQS)](https://aws.amazon.com/sqs/) | Core. Used as a durable buffer for when we need to capture events from rules, but need to govern scale-out. |
-| [Amazon Simple Storage Service (S3)](https://aws.amazon.com/s3/) | Core. Stores audit and transaction logs captured by EventBridge archives. |
-| [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) | Core. Acts as one possible ingest method for inbound transactions. Transactions are written to a DynamoDB table, which pushes records onto a DynamoDB stream. The stream records are published to the EventBridge event bus to start the processing lifecycle. |
-| [AWS Step Functions](https://aws.amazon.com/step-functions/) | Supporting. Implements a simple business rules system, triggering alternate processing paths for transactions with unique characteristics. This could be implemented by alternate business rules systems like [Drools](https://www.drools.org/). |
-| [Amazon CloudWatch](https://aws.amazon.com/cloudwatch/) | Supporting. Monitors system health via metrics and logs. |
-| [AWS X-Ray](https://aws.amazon.com/xray/) | Supporting. Traces transaction processing across components. |
-| [AWS Identity and Access Management (IAM)](https://aws.amazon.com/iam/) | Supporting. Defines roles and access policies between components in the system. |
-| [AWS Key Management Service (KMS)](https://aws.amazon.com/kms/) | Supporting. Manages encryption of transaction data. |
+| **AWS service**  | Role|  Description |
+|-----------|------------|------------|
+| [Amazon Eventbridge](https://aws.amazon.com/eventbridge/) | Core | An EventBridge custom event bus is paired with EventBridge rules to route transaction processing events to subscribed components. The emitted events describe the lifecycle of transactions as they move through the system. Additionally, an EventBridge pipe is used to consume the inbound transaction stream and publish events to the event bus. |
+| [AWS Lambda](https://aws.amazon.com/lambda/) | Core | Runs custom code in response to events. This guidance includes a sample duplication detection function, a transaction enrichment function, a sample posting system integration function, and others. |
+| [Amazon Simple Queue Service (Amazon SQS)](https://aws.amazon.com/sqs/) | Core | Used as a durable buffer for when you need to capture events from rules and also need to govern scale-out. |
+| [Amazon Simple Storage Service (Amazon S3)](https://aws.amazon.com/s3/) | Core | Stores audit and transaction logs captured by EventBridge archives. |
+| [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) | Core | Acts as a possible ingest method for inbound transactions. Transactions are written to a DynamoDB table, which pushes records onto a DynamoDB stream. The stream records are published to the EventBridge event bus to start the processing lifecycle. |
+| [AWS Step Functions](https://aws.amazon.com/step-functions/) | Supporting | Implements a simple business rules system, initiaiting alternate processing paths for transactions with unique characteristics. This could be implemented by alternate business rules systems like [Drools](https://www.drools.org/). |
+| [Amazon CloudWatch](https://aws.amazon.com/cloudwatch/) | Supporting | Monitors system health through metrics and logs. |
+| [AWS X-Ray](https://aws.amazon.com/xray/) | Supporting | Traces transaction processing across components. |
+| [AWS Identity and Access Management (IAM)](https://aws.amazon.com/iam/) | Supporting | Defines roles and access policies between components in the system. |
+| [AWS Key Management Service (AWS KMS)](https://aws.amazon.com/kms/) | Supporting | Manages encryption of transaction data. |
 
 ### Cost
 
-You are responsible for the cost of the AWS services used while running this Guidance. As of April 2024, the cost for running this Guidance with the default settings in the US East (N. Virginia) Region is approximately **\$1 per month**, assuming 3,000 transactions.
+You are responsible for the cost of the AWS services used while running this guidance. As of April 2024, the cost for running this guidance with the default settings in the US East (N. Virginia) Region is approximately **\$1 per month**, assuming 3,000 transactions.
 
-This Guidance uses [Serverless services](https://aws.amazon.com/serverless/), which use a pay-for-value billing model. Costs are incurred with usage of the deployed resources. Refer to the [Sample cost table](#sample-cost-table) for a service-by-service cost breakdown.
+This guidance uses [Serverless services](https://aws.amazon.com/serverless/), which use a pay-for-value billing model. Costs are incurred with usage of the deployed resources. Refer to the [Sample cost table](#sample-cost-table) for a service-by-service cost breakdown.
 
-We recommend creating a [budget](https://alpha-docs-aws.amazon.com/awsaccountbilling/latest/aboutv2/budgets-create.html) through [AWS Cost Explorer](http://aws.amazon.com/aws-cost-management/aws-cost-explorer/) to help manage costs. Prices are subject to change. For full details, refer to the pricing webpage for each AWS service used in this Guidance.
+We recommend creating a [budget](https://alpha-docs-aws.amazon.com/awsaccountbilling/latest/aboutv2/budgets-create.html) through [AWS Cost Explorer](http://aws.amazon.com/aws-cost-management/aws-cost-explorer/) to help manage costs. Prices are subject to change. For full details, refer to the pricing webpage for each AWS service used in this guidance.
 
 #### Sample cost table
 
-The following table provides a sample cost breakdown for deploying this Guidance with the default parameters in the US East (N. Virginia) Region for one month.
+The following table provides a sample cost breakdown for deploying this guidance with the default parameters in the US East (N. Virginia) Region for one month assuming "non-production" level traffic volume.
 
 | **AWS service**  | Dimensions | Cost \[USD\] |
 |-----------|------------|---------|
@@ -95,9 +93,11 @@ The following table provides a sample cost breakdown for deploying this Guidance
 | [AWS Lambda](https://aws.amazon.com/lambda/pricing/) | 3,000 requests per month with 200 ms avg duration, 128 MB memory, 512 MB ephemeral storage | \$ 0.00 |
 | [Amazon SQS](https://aws.amazon.com/sqs/pricing/) | 0.03 million requests per month | \$ 0.00 |
 | [AWS Step Functions](https://aws.amazon.com/step-functions/pricing/) | 3,000 workflow requests per month with 3 state transitions per workflow | \$ 0.13 |
-| [Amazon SNS](https://aws.amazon.com/sns/pricing/)| 3,000 requests users nd 3000 Email notifications per month | \$ 0.04 |
+| [Amazon SNS](https://aws.amazon.com/sns/pricing/)| 3,000 requests users and 3000 Email notifications per month | \$ 0.04 |
 | [Amazon EventBridge](https://aws.amazon.com/eventbridge/pricing/) | 3,000 custom events per month with 3000 events replay and 3000 requests in the pipes | \$ 0.00 |
 |**Total estimated cost per month:**| | **\$1** |
+
+A sample cost breakdown for production scale load (around 20 mln requests/month) can be found in this [AWS Pricing Calculator estimate](https://calculator.aws/#/estimate?id=ff3373df6fb3eb3856fe263a3390ca96f9598c79) and is estimated around **$1,811.15 USD/month**
 
 ## Prerequisites
 
@@ -105,7 +105,7 @@ The following table provides a sample cost breakdown for deploying this Guidance
 
 These deployment instructions are optimized to work on Amazon Linux 2 or Mac OSX.
 
-This solution builds AWS Lambda functions using Python. The build process currently supports Linux and MacOS. It was tested with Python `3.11`. You will need [Python and Pip](https://www.python.org/) to build and deploy.
+This solution builds [Lambda](https://aws.amazon.com/lambda/) functions using Python. The build process currently supports Linux and MacOS. It was tested with Python `3.11`. You will need [Python and Pip](https://www.python.org/) to build and deploy.
 
 ### Third-party tools
 
@@ -117,6 +117,10 @@ You can install Terraform on Linux (such as a CodeBuild build agent) with comman
 curl -o terraform_1.7.1_linux_amd64.zip https://releases.hashicorp.com/terraform/1.7.1/terraform_1.7.1_linux_amd64.zip
 unzip -o terraform_1.7.1_linux_amd64.zip && mv terraform /usr/bin
 ```
+
+The solution is deployed as one Terraform config. The Root HCL config file (main.tf) dictates the flow and all the submodules are bundled under this repo in individual folders (for example `/sqs` for the sqs module). Lambda code can be found under the `/src` folder.
+
+The solution uses a local [Terraform backend](https://developer.hashicorp.com/terraform/language/settings/backends/configuration) for deployment simplicity. You may want to switch to a shared backend like S3 for collaboration, or when using a CI/CD pipeline.
 
 ### AWS account requirements
 
@@ -138,32 +142,16 @@ Services include:
 Experimental workloads should fit within default service quotas for the involved services.
 
 ## Deployment Instructions
-TO DO - UPDATE WITH LIVE IG LINK
-Please see detailed deployment, validation and cleanup instructions in the [Implementation Guide](https://implementationguides.kits.eventoutfitters.aws.dev/cped-payment-1214/compute/cross-platform-event-driven-payment-systems.html)
+
+Please see detailed deployment, validation and cleanup instructions in the [Implementation Guide](https://aws-solutions-library-samples.github.io/compute/building-payment-systems-using-event-driven-architecture-on-aws.html)
 
 ## Next Steps
 
-PLease consider subscribing your own business rules engine to the EventBridge event bus and processing inbound transactions using your own logic.
+Consider subscribing your own business rules engine to the EventBridge event bus and processing inbound transactions using your own logic.
 
 - Visit [ServerlessLand](https://serverlessland.com/) for more information on building with AWS Serverless services
 - Visit [What is an Event-Driven Architecture?](https://aws.amazon.com/event-driven-architecture/) in the AWS documentation for more information about Event-Driven systems
 
-<!--
-## Cleanup
-
-You can uninstall the 'Guidance for building cross-platform event-driven payment systems on AWS'  manually using the AWS Management Console or by using the Terraform CLI. 
-
-To manually remove the deployed resources, use the [`terraform show` command](https://developer.hashicorp.com/terraform/cli/commands/show) to list the resources that were deployed. Find those resources in the AWS Management Console and delete them. Finally, empty and delete the Terraform state-tracking [S3](https://aws.amazon.com/s3/) bucket.
-
-To automatically remove the resources with Terraform, follow these steps:
-
-1. Empty the the Guidance S3 buckets in the AWS Management Console. WS Guidance\'s Implementations do not automatically delete [S3](https://aws.amazon.com/s3/) bucket content in case you have stored data to retain.
-2. To remove the provisoned resources, run the following command from the root of the `/source` directory in the code repository:
-
-```bash
-terraform destroy -var="region=<your target region>"
-```
--->
 
 ## FAQ, known issues, additional considerations, and limitations
 
@@ -232,9 +220,15 @@ We have one in place at this time, but are only using it for duplicate checks fo
 
 At this time, we assume that cloudwatch+cloudtrail is sufficient for logging/auditing purposes, unless requirements change.
 
-#### How is this PCI- (etc.) compliant? 
+#### How is this PCI-DSS compliant? 
 
-We assume all inbound records are pre-tokenized. This will be described in our event schemas. All included services are in scope for PCI/etc. Customer-managed keys will be for encryption wherever possible.
+We assume all inbound records are pre-tokenized. This will be described in our event schemas. For an example of how to achieve this, customers can refer to [this blog post](https://aws.amazon.com/blogs/compute/building-a-serverless-tokenization-solution-to-mask-sensitive-data/).
+
+All included services are [in scope for PCI-DSS](https://aws.amazon.com/compliance/pci-dss-level-1-faqs/). Customer-managed keys should be used for encryption wherever possible. Data at both rest and in flight will be encrypted. DynamoDB streams are encrypted with a table-level encryption key. For SQS, customers can protect data in transit using Secure Sockets Layer (SSL) or client-side encryption. By default, Amazon SQS stores messages and files using disk encryption. Customers can protect data at rest by configuring SQS to encrypt your messages before saving them to the encrypted file system. SQS recommends using Server-side encryption (SSE) for optimized data encryption. Additionally, SNS lets you store sensitive data in encrypted topics by protecting the contents using keys managed in Key Management Service (KMS). When SSE is configured for SNS, messages are encrypted as soon as SNS receives them. The messages are stored in encrypted form, and only decrypted when they are sent.
+
+As key fields from the inbound authorization are fully tokenized, they pass through the work flow using the controls mentioned above.
+
+Additional security guidance can be found in the [Security pillar](https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/) of the AWS Well Architected Framework and the [Architecture Center](https://aws.amazon.com/architecture/security-identity-compliance/).
 
 #### What is the defined blast radius for cloud provider impact? 
 
@@ -248,14 +242,16 @@ We see financial services customers using mostly Java and Python. For simplicity
 
 - 1.0.0: Initial Version
 - 1.0.1: Reviewed and updated version 5/15/24
+- 1.0.2: Pre publication revision 5/29/24
+- 1.0.3: Publication version 6/11/24
 
 ## Notices
 
-*Customers are responsible for making their own independent assessment of the information in this Guidance. This Guidance: (a) is for informational purposes only, (b) represents AWS current product offerings and practices, which are subject to change without notice, and (c) does not create any commitments or assurances from AWS and its affiliates, suppliers or licensors. AWS products or services are provided “as is” without warranties, representations, or conditions of any kind, whether express or implied. AWS responsibilities and liabilities to its customers are controlled by AWS agreements, and this Guidance is not part of, nor does it modify, any agreement between AWS and its customers.*
+*Customers are responsible for making their own independent assessment of the information in this guidance. This guidance: (a) is for informational purposes only, (b) represents AWS current product offerings and practices, which are subject to change without notice, and (c) does not create any commitments or assurances from AWS and its affiliates, suppliers or licensors. AWS products or services are provided “as is” without warranties, representations, or conditions of any kind, whether express or implied. AWS responsibilities and liabilities to its customers are controlled by AWS agreements, and this guidance is not part of, nor does it modify, any agreement between AWS and its customers.*
 
 ## Authors
 
-- Ramesh Mathikumar, Pr. DevOps Consultant
-- Rajdeep Banerjee, Pr. Slutions Architect
-- Brian Krygsman, Sr. Solutions Architect
-- Daniel Zilberman, Sr. Solutions Architect Technical Solutions
+- Ramesh Mathikumar, Principal DevOps Consultant
+- Rajdeep Banerjee, Senior Solutions Architect
+- Brian Krygsman, Senior Solutions Architect
+- Daniel Zilberman, Senior Solutions Architect Technical Solutions
