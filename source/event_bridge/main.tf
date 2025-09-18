@@ -240,7 +240,7 @@ resource "aws_cloudwatch_event_target" "cctran_cw" {
 }
 
 resource "aws_cloudwatch_event_rule" "merchant" {
-  name = "cc-transactions-posted"
+  name = "cc-transactions-merchant"
   event_bus_name = aws_cloudwatch_event_bus.this.name
   event_pattern = jsonencode(
 
